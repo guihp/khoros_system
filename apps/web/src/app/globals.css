@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens KHOROS — acolhedor, calmo, confiável.
+ * Base clara e arejada; azuis/verdes suaves com o ciano KHOROS como acento.
+ * Contraste mínimo WCAG AA em todos os pares texto/fundo.
+ */
+@theme {
+  /* Acento — ciano KHOROS */
+  --color-brand-50: #ecfeff;
+  --color-brand-100: #cffafe;
+  --color-brand-200: #a5f3fc;
+  --color-brand-400: #22d3ee;
+  --color-brand-600: #0891b2; /* AA sobre branco */
+  --color-brand-700: #0e7490;
+  --color-brand-800: #155e75;
+
+  /* Neutros mornos, sem frieza de fintech */
+  --color-calm-50: #f8fafa;
+  --color-calm-100: #f1f5f5;
+  --color-calm-200: #e2eaea;
+  --color-calm-400: #94a8a8;
+  --color-calm-600: #4d6363;
+  --color-calm-800: #253434;
+  --color-calm-900: #162222;
+
+  /* Verde suave — estados positivos, disponibilidade */
+  --color-sage-100: #e7f2ec;
+  --color-sage-600: #2e7d5b;
+
+  /* Sinalização discreta (saldo, avisos) — nunca alarmista */
+  --color-warn-100: #fdf3e0;
+  --color-warn-700: #8a5a12;
+
+  --font-sans: var(--font-geist, ui-sans-serif), system-ui, -apple-system, sans-serif;
+
+  --radius-card: 1rem;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-color: var(--color-calm-50);
+  color: var(--color-calm-900);
+}

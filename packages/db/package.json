@@ -1,0 +1,13 @@
+{
+  "name": "@khoros/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate": "node scripts/migrate.mjs",
+    "typecheck": "echo 'sql only'"
+  },
+  "devDependencies": {
+    "pg": "^8.16.0"
+  }
+}

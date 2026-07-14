@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Proposta Comercial — KHOROS · Elonai Automações</title>
+<style>
+  @page { size: A4; margin: 0; }
+  @page cover { margin: 0; }
+  @page content {
+    margin: 50px 45px 60px 45px;
+    @bottom-center {
+      content: "Elonai Automações  ·  CNPJ 55.200.585/0001-85  ·  Página " counter(page) " de " counter(pages);
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 8pt;
+      color: #8B8B9E;
+      padding-top: 12px;
+      border-top: 0.5pt solid #E5E5EA;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #1A1A2E; line-height: 1.5; font-size: 10pt; }
+
+  /* CAPA */
+  .cover {
+    page: cover;
+    width: 210mm; height: 297mm;
+    background: linear-gradient(135deg, #000000 0%, #0A0A2A 35%, #1A0B3D 65%, #2D1B5E 100%);
+    position: relative; overflow: hidden; color: white;
+    page-break-after: always;
+  }
+  .cover::before {
+    content: ''; position: absolute; top: -30%; right: -30%;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(90, 70, 240, 0.35) 0%, rgba(90, 70, 240, 0) 70%);
+    border-radius: 50%;
+  }
+  .cover::after {
+    content: ''; position: absolute; bottom: -30%; left: -30%;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(45, 27, 94, 0.5) 0%, rgba(45, 27, 94, 0) 70%);
+    border-radius: 50%;
+  }
+  .cover-content {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    padding: 55px 50px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    z-index: 2;
+  }
+  /* LOGO (vetor, recriado fiel à marca) */
+  .cover-logo {
+    position: absolute; top: 46px; left: 50px; z-index: 3;
+  }
+  .logo-word {
+    font-size: 38pt; font-weight: 700; letter-spacing: -1px;
+    color: #FFFFFF; line-height: 1; position: relative; display: inline-block;
+  }
+  .logo-spark {
+    position: absolute; top: -10px; right: -6px; width: 22px; height: 22px;
+  }
+  .logo-sub {
+    font-size: 8.5pt; letter-spacing: 8px; font-weight: 500;
+    color: rgba(255,255,255,0.85); margin-top: 6px; padding-left: 3px;
+  }
+  .cover-title-block {
+    margin-top: 0; max-width: 100%; flex: 1;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .cover-eyebrow {
+    font-size: 10pt; letter-spacing: 4px; text-transform: uppercase;
+    color: #A894F5; font-weight: 500; margin-bottom: 20px;
+  }
+  .cover-title {
+    font-size: 52pt; font-weight: 300; letter-spacing: -2px;
+    line-height: 1.05; margin-bottom: 12px; color: white;
+  }
+  .cover-title strong { font-weight: 700; color: #B8A8FF; }
+  .cover-subtitle {
+    font-size: 13pt; color: rgba(255, 255, 255, 0.65);
+    font-weight: 300; margin-top: 20px; max-width: 82%; line-height: 1.5;
+  }
+  .cover-meta {
+    flex-shrink: 0; display: flex; justify-content: space-between;
+    padding-top: 30px; border-top: 1px solid rgba(168, 148, 245, 0.25);
+  }
+  .cover-meta-block { font-size: 9pt; }
+  .cover-meta-label {
+    color: #A894F5; letter-spacing: 2px; text-transform: uppercase;
+    font-size: 8pt; margin-bottom: 6px; font-weight: 500;
+  }
+  .cover-meta-value { color: rgba(255, 255, 255, 0.9); font-size: 11pt; font-weight: 400; }
+
+  /* PÁGINAS */
+  .content { page: content; }
+  .page { page-break-after: always; }
+  .page:last-child { page-break-after: auto; }
+
+  .page-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding-bottom: 12px; margin-bottom: 22px; border-bottom: 2px solid #2D1B5E;
+  }
+  .page-header-title {
+    font-size: 9pt; color: #6E6E85; letter-spacing: 2px;
+    text-transform: uppercase; font-weight: 600;
+  }
+  .page-header-brand { font-size: 9pt; color: #2D1B5E; font-weight: 700; letter-spacing: 1px; }
+
+  h1.section-title {
+    font-size: 22pt; font-weight: 300; color: #0A0A2A;
+    margin-bottom: 4px; letter-spacing: -1px;
+  }
+  h1.section-title strong { font-weight: 700; color: #2D1B5E; }
+  .section-subtitle { font-size: 10pt; color: #6E6E85; margin-bottom: 10px; font-weight: 300; }
+  h2 { font-size: 13pt; color: #1A0B3D; font-weight: 600; margin-top: 18px; margin-bottom: 10px; }
+  p { margin-bottom: 8px; color: #2A2A3E; font-size: 10pt; line-height: 1.55; }
+
+  /* INTRO */
+  .intro-block {
+    background: linear-gradient(135deg, #F5F3FF 0%, #EDE8FF 100%);
+    padding: 22px 26px; border-radius: 10px;
+    border-left: 4px solid #5A46F0; margin-bottom: 20px;
+  }
+  .intro-block p { font-size: 10pt; color: #2A2A3E; margin-bottom: 6px; line-height: 1.55; }
+  .intro-block p:last-child { margin-bottom: 0; }
+  .highlight { color: #5A46F0; font-weight: 600; }
+
+  /* MÓDULOS */
+  .modulo {
+    background: white; border: 1px solid #E5E5EA; border-radius: 10px;
+    padding: 8px 15px; margin-bottom: 4px; page-break-inside: avoid;
+  }
+  .modulo-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px solid #F0F0F5; gap: 12px;
+  }
+  .modulo-titulo { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+  .modulo-numero {
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, #2D1B5E 0%, #5A46F0 100%);
+    color: white; border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 11pt; flex-shrink: 0;
+  }
+  .modulo-titulo-texto { flex: 1; min-width: 0; }
+  .modulo-nome { font-size: 11.5pt; color: #0A0A2A; font-weight: 700; line-height: 1.2; }
+  .modulo-nome-sub {
+    font-size: 7.5pt; color: #6E6E85; font-weight: 400;
+    margin-top: 1px; letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .modulo ul { list-style: none; padding: 0; }
+  .modulo ul li {
+    padding: 1px 0 1px 15px; position: relative;
+    color: #2A2A3E; font-size: 8.7pt; line-height: 1.32;
+  }
+  .modulo ul li::before {
+    content: ''; position: absolute; left: 0; top: 8px;
+    width: 8px; height: 2px;
+    background: linear-gradient(90deg, #5A46F0 0%, #A894F5 100%);
+  }
+
+  /* BENEFÍCIOS */
+  .beneficios-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; margin-top: 6px; }
+  .beneficio {
+    background: linear-gradient(135deg, #FAFAFE 0%, #F5F3FF 100%);
+    border: 1px solid #E8E3FF; border-radius: 9px;
+    padding: 13px 15px; page-break-inside: avoid;
+  }
+  .beneficio-icon {
+    width: 26px; height: 26px;
+    background: linear-gradient(135deg, #2D1B5E 0%, #5A46F0 100%);
+    border-radius: 7px; color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 10.5pt; margin-bottom: 7px;
+  }
+  .beneficio-titulo { font-size: 10pt; color: #0A0A2A; font-weight: 700; margin-bottom: 3px; }
+  .beneficio-descricao { font-size: 9pt; color: #4A4A5E; line-height: 1.45; margin: 0; }
+
+  /* ARQUITETURA DIAGRAMA */
+  .arch-diagram {
+    background: white; border: 1px solid #E5E5EA; border-radius: 11px;
+    padding: 18px; margin-bottom: 14px; page-break-inside: avoid;
+  }
+  .arch-diagram svg { width: 100%; height: auto; display: block; }
+  .arch-note {
+    font-size: 8.5pt; color: #6E6E85; text-align: center; margin-top: 8px; font-style: italic;
+  }
+
+  /* CRONOGRAMA */
+  .cronograma { background: white; border-radius: 10px; }
+  .cronograma-item {
+    display: flex; padding: 13px 0; border-bottom: 1px solid #F0F0F5; page-break-inside: avoid;
+  }
+  .cronograma-item:last-child { border-bottom: none; }
+  .cronograma-semana { flex-shrink: 0; width: 120px; padding-right: 16px; }
+  .cronograma-semana-label {
+    display: inline-block;
+    background: linear-gradient(135deg, #2D1B5E 0%, #5A46F0 100%);
+    color: white; font-size: 8.5pt; font-weight: 700;
+    padding: 4px 10px; border-radius: 5px; letter-spacing: 0.5px;
+  }
+  .cronograma-descricao { flex: 1; }
+  .cronograma-titulo { font-size: 10.5pt; font-weight: 700; color: #0A0A2A; margin-bottom: 3px; }
+  .cronograma-detalhe { font-size: 9pt; color: #4A4A5E; line-height: 1.5; }
+  .cronograma-entrega { font-size: 8.5pt; color: #5A46F0; font-weight: 600; margin-top: 4px; }
+
+  /* ROI / DESTAQUE HERO */
+  .roi-hero {
+    background: linear-gradient(135deg, #0A0A2A 0%, #1A0B3D 45%, #2D1B5E 100%);
+    color: white; border-radius: 16px;
+    padding: 28px 32px; position: relative; overflow: hidden; margin-bottom: 20px;
+  }
+  .roi-hero::before {
+    content: ''; position: absolute; top: -40%; right: -20%;
+    width: 450px; height: 450px;
+    background: radial-gradient(circle, rgba(90, 70, 240, 0.35) 0%, rgba(90, 70, 240, 0) 70%);
+    border-radius: 50%;
+  }
+  .roi-hero-label {
+    font-size: 8.5pt; color: #A894F5; letter-spacing: 3px; text-transform: uppercase;
+    font-weight: 600; margin-bottom: 14px; position: relative; z-index: 2;
+  }
+  .roi-hero-valor {
+    font-size: 40pt; font-weight: 700; color: white;
+    letter-spacing: -2px; line-height: 1; position: relative; z-index: 2;
+  }
+  .roi-hero-valor small { font-size: 15pt; color: #A894F5; font-weight: 400; letter-spacing: 0; }
+  .roi-hero-texto {
+    font-size: 10.5pt; color: rgba(255, 255, 255, 0.85);
+    margin-top: 12px; position: relative; z-index: 2; line-height: 1.55; max-width: 88%;
+  }
+  .roi-hero-texto strong { color: #B8A8FF; font-weight: 600; }
+
+  /* ROI GRID / STATS */
+  .roi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+  .roi-grid.four { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .roi-card {
+    background: white; border: 1px solid #E5E5EA; border-radius: 10px;
+    padding: 16px 18px; page-break-inside: avoid;
+  }
+  .roi-card-label {
+    font-size: 7.5pt; color: #5A46F0; letter-spacing: 1.5px;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 4px;
+  }
+  .roi-card-numero { font-size: 20pt; color: #0A0A2A; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+  .roi-card-desc { font-size: 8.5pt; color: #6E6E85; margin-top: 6px; line-height: 1.4; }
+
+  /* CAIXA DESTAQUE TRACEJADA */
+  .roi-calc {
+    background: white; border: 1.5px dashed #A894F5; border-radius: 11px;
+    padding: 16px 20px; margin-top: 4px; page-break-inside: avoid;
+  }
+  .roi-calc-titulo {
+    font-size: 9pt; color: #5A46F0; letter-spacing: 1.5px;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 8px;
+  }
+  .roi-calc-linha {
+    display: flex; justify-content: space-between; padding: 4px 0; font-size: 9.5pt; color: #2A2A3E;
+  }
+  .roi-calc-linha.total {
+    border-top: 1.5px solid #2D1B5E; margin-top: 6px; padding-top: 8px;
+    font-weight: 700; color: #2D1B5E; font-size: 10.5pt;
+  }
+
+  /* SEGURANÇA */
+  .sec-card {
+    background: white; border: 1px solid #E5E5EA; border-left: 3px solid #5A46F0;
+    border-radius: 9px; padding: 13px 16px; page-break-inside: avoid;
+  }
+  .sec-titulo { font-size: 10pt; color: #2D1B5E; font-weight: 700; margin-bottom: 3px; }
+  .sec-desc { font-size: 9pt; color: #4A4A5E; line-height: 1.5; margin: 0; }
+
+  /* INVESTIMENTO */
+  .caminhos-intro {
+    background: #F5F3FF; border-radius: 10px; padding: 14px 18px;
+    margin-bottom: 16px; border-left: 3px solid #5A46F0;
+  }
+  .caminhos-intro p { font-size: 9.5pt; color: #2A2A3E; margin: 0; line-height: 1.55; }
+
+  .caminho-card {
+    background: white; border: 1.5px solid #E5E5EA; border-radius: 12px;
+    padding: 18px 22px; margin-bottom: 12px; page-break-inside: avoid;
+  }
+  .caminho-card.recomendado {
+    border-color: #5A46F0; background: linear-gradient(135deg, #FAFAFE 0%, #F5F3FF 100%); position: relative;
+  }
+  .caminho-card.recomendado::before {
+    content: 'RECOMENDADO'; position: absolute; top: -10px; right: 20px;
+    background: linear-gradient(135deg, #2D1B5E 0%, #5A46F0 100%);
+    color: white; font-size: 7.5pt; font-weight: 700;
+    letter-spacing: 1.5px; padding: 4px 12px; border-radius: 5px;
+  }
+  .caminho-header {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #E5E5EA; gap: 14px;
+  }
+  .caminho-nome-bloco { flex: 1; }
+  .caminho-tag {
+    font-size: 8pt; color: #5A46F0; letter-spacing: 2px;
+    text-transform: uppercase; font-weight: 700; margin-bottom: 3px;
+  }
+  .caminho-nome { font-size: 14pt; color: #0A0A2A; font-weight: 700; line-height: 1.2; }
+  .caminho-sub { font-size: 9pt; color: #6E6E85; margin-top: 3px; }
+  .caminho-valor { text-align: right; flex-shrink: 0; }
+  .caminho-valor-numero { font-size: 18pt; font-weight: 700; color: #2D1B5E; letter-spacing: -0.5px; line-height: 1; }
+  .caminho-valor-sub { font-size: 8.5pt; color: #6E6E85; margin-top: 3px; }
+  .caminho-features-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; row-gap: 4px; }
+  .caminho-feature {
+    padding: 3px 0 3px 16px; position: relative; font-size: 8.8pt; color: #2A2A3E; line-height: 1.4; break-inside: avoid;
+  }
+  .caminho-feature.pro::before {
+    content: '✓'; position: absolute; left: 0; top: 2px; color: #5A46F0; font-weight: 700; font-size: 10pt;
+  }
+
+  /* SETUP HERO / FASES */
+  .setup-hero {
+    background: white; border: 1.5px solid #E5E5EA; border-radius: 14px;
+    padding: 20px 24px; margin-bottom: 14px; page-break-inside: avoid; position: relative; overflow: hidden;
+  }
+  .setup-hero-bg {
+    position: absolute; top: 0; right: 0; width: 280px; height: 100%;
+    background: linear-gradient(135deg, rgba(90, 70, 240, 0.04) 0%, rgba(168, 148, 245, 0.08) 100%); pointer-events: none;
+  }
+  .setup-hero-content { position: relative; z-index: 2; }
+  .setup-hero-label {
+    font-size: 9pt; color: #6E6E85; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-bottom: 12px;
+  }
+  .setup-hero-modulos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .setup-hero-modulo { padding: 10px 12px; background: #FAFAFE; border: 1px solid #EEE8FF; border-radius: 8px; }
+  .setup-hero-modulo-fase {
+    font-size: 7.5pt; color: #5A46F0; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; margin-bottom: 3px;
+  }
+  .setup-hero-modulo-nome { font-size: 9pt; color: #1A0B3D; font-weight: 600; line-height: 1.35; }
+
+  .setup-parcelamento {
+    background: linear-gradient(135deg, #0A0A2A 0%, #2D1B5E 100%); border-radius: 12px;
+    padding: 18px 22px; display: flex; align-items: center; gap: 20px; color: white;
+    position: relative; overflow: hidden; margin-bottom: 14px;
+  }
+  .setup-parcelamento::before {
+    content: ''; position: absolute; top: -40%; right: -10%; width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(168, 148, 245, 0.25) 0%, rgba(168, 148, 245, 0) 70%); border-radius: 50%;
+  }
+  .setup-parcelamento-main { flex: 1.3; position: relative; z-index: 2; }
+  .setup-parcelamento-label {
+    font-size: 7.5pt; color: #A894F5; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-bottom: 6px;
+  }
+  .setup-parcelamento-valor { font-size: 26pt; font-weight: 700; color: white; letter-spacing: -1.5px; line-height: 1; margin-bottom: 4px; }
+  .setup-parc-x { font-size: 18pt; font-weight: 400; color: #A894F5; margin: 0 4px; }
+  .setup-parc-numero { color: #B8A8FF; }
+  .setup-parcelamento-sub { font-size: 9pt; color: rgba(255, 255, 255, 0.75); font-weight: 400; }
+  .setup-parcelamento-divider { width: 1px; align-self: stretch; background: rgba(168, 148, 245, 0.3); position: relative; z-index: 2; }
+  .setup-parcelamento-alt { flex: 1; position: relative; z-index: 2; padding-left: 4px; }
+  .setup-alt-label {
+    font-size: 7.5pt; color: #A894F5; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; margin-bottom: 6px;
+  }
+  .setup-alt-valor { font-size: 20pt; font-weight: 700; color: white; letter-spacing: -0.5px; line-height: 1; margin-bottom: 4px; }
+  .setup-alt-sub { font-size: 8.5pt; color: rgba(255, 255, 255, 0.7); }
+
+  .setup-selos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .setup-selo { display: flex; align-items: center; gap: 6px; }
+  .setup-selo-icon {
+    width: 18px; height: 18px; background: linear-gradient(135deg, #2D1B5E 0%, #5A46F0 100%);
+    color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 9pt; font-weight: 700; flex-shrink: 0;
+  }
+  .setup-selo-text { font-size: 8.5pt; color: #2A2A3E; font-weight: 500; }
+  .setup-nota { font-size: 8.5pt; color: #6E6E85; margin-top: 6px; font-style: italic; }
+
+  /* TABELA DE FASES */
+  .fases-tabela { background: white; border: 1px solid #E5E5EA; border-radius: 10px; padding: 6px 18px; margin-bottom: 12px; }
+  .fase-linha {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 11px 0; border-bottom: 1px solid #F0F0F5; gap: 14px;
+  }
+  .fase-linha:last-child { border-bottom: none; }
+  .fase-info { flex: 1; }
+  .fase-nome { font-size: 10pt; color: #0A0A2A; font-weight: 700; }
+  .fase-desc { font-size: 8.5pt; color: #6E6E85; margin-top: 1px; }
+  .fase-prazo { font-size: 8.5pt; color: #6E6E85; width: 80px; text-align: center; flex-shrink: 0; }
+  .fase-valor { font-size: 11pt; color: #2D1B5E; font-weight: 700; width: 130px; text-align: right; flex-shrink: 0; }
+  .fase-valor.dim { color: #8B8B9E; font-weight: 600; font-size: 9.5pt; }
+
+  /* CHIPS SETORES */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+  .chip {
+    font-size: 9pt; color: #2D1B5E; font-weight: 600;
+    background: #F5F3FF; border: 1px solid #E8E3FF; border-radius: 100px; padding: 5px 13px;
+  }
+
+  /* GARANTIAS */
+  .garantias-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px; margin-bottom: 18px; }
+  .garantia-card { background: white; border: 1px solid #E5E5EA; border-radius: 9px; padding: 13px 15px; page-break-inside: avoid; }
+  .garantia-titulo { font-size: 10pt; color: #2D1B5E; font-weight: 700; margin-bottom: 3px; }
+  .garantia-desc { font-size: 9pt; color: #4A4A5E; line-height: 1.5; margin: 0; }
+
+  /* PASSOS */
+  .passos-lista { counter-reset: passo; list-style: none; padding: 0; margin-top: 8px; }
+  .passos-lista li {
+    counter-increment: passo; position: relative; padding: 10px 0 10px 52px; border-bottom: 1px solid #F0F0F5;
+  }
+  .passos-lista li:last-child { border-bottom: none; }
+  .passos-lista li::before {
+    content: counter(passo); position: absolute; left: 0; top: 10px; width: 36px; height: 36px;
+    background: linear-gradient(135deg, #2D1B5E 0%, #5A46F0 100%); color: white; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13pt;
+  }
+  .passos-titulo { font-size: 10.5pt; color: #0A0A2A; font-weight: 700; margin-bottom: 2px; }
+  .passos-desc { font-size: 9pt; color: #4A4A5E; margin: 0; line-height: 1.5; }
+
+  /* CONTATO */
+  .contato-final {
+    background: linear-gradient(135deg, #0A0A2A 0%, #2D1B5E 100%); color: white; border-radius: 12px;
+    padding: 22px 26px; margin-top: 18px; position: relative; overflow: hidden;
+  }
+  .contato-final::before {
+    content: ''; position: absolute; top: -50%; right: -20%; width: 350px; height: 350px;
+    background: radial-gradient(circle, rgba(168, 148, 245, 0.2) 0%, rgba(168, 148, 245, 0) 70%); border-radius: 50%;
+  }
+  .contato-final-titulo { font-size: 14pt; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 2; }
+  .contato-final-desc {
+    font-size: 9.5pt; color: rgba(255, 255, 255, 0.8); margin-bottom: 12px; line-height: 1.5; position: relative; z-index: 2;
+  }
+  .contato-info { font-size: 10.5pt; color: white; position: relative; z-index: 2; font-weight: 500; }
+  .contato-info strong {
+    color: #A894F5; letter-spacing: 1px; font-size: 8.5pt; text-transform: uppercase;
+    display: block; margin-top: 10px; margin-bottom: 3px; font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========================= CAPA ========================= -->
+<div class="cover">
+  <div class="cover-logo">
+    <div class="logo-word">Elonai<svg class="logo-spark" viewBox="0 0 24 24"><g stroke="#B8A8FF" stroke-width="2" stroke-linecap="round"><line x1="12" y1="2" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="22"/><line x1="2" y1="12" x2="8" y2="12"/><line x1="16" y1="12" x2="22" y2="12"/></g></svg></div>
+    <div class="logo-sub">AUTOMAÇÕES</div>
+  </div>
+  <div class="cover-content">
+    <div class="cover-title-block">
+      <div class="cover-eyebrow">Proposta Técnica e Comercial</div>
+      <div class="cover-title">Plataforma<br><strong>KHOROS</strong></div>
+      <div class="cover-subtitle">
+        Consultoria instantânea por vídeo, paga por minuto — infraestrutura,
+        marketplace e motor de bilhetagem desenvolvidos sob medida.
+      </div>
+    </div>
+    <div class="cover-meta">
+      <div class="cover-meta-block">
+        <div class="cover-meta-label">Preparada para</div>
+        <div class="cover-meta-value">José Alberto</div>
+      </div>
+      <div class="cover-meta-block" style="text-align: center;">
+        <div class="cover-meta-label">Validade</div>
+        <div class="cover-meta-value">15 dias</div>
+      </div>
+      <div class="cover-meta-block" style="text-align: right;">
+        <div class="cover-meta-label">Data</div>
+        <div class="cover-meta-value">19/06/2026</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ========================= PÁGINA 2 — SOBRE A ELONAI ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">01 · Sobre a Elonai</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <h1 class="section-title">Quem vai <strong>construir</strong></h1>
+  <p class="section-subtitle">Antes do projeto, um pouco da experiência por trás dele.</p>
+
+  <div class="intro-block">
+    <p>
+      A <span class="highlight">Elonai Automações</span> desenvolve e coloca sistemas em produção há mais de
+      três anos. Não é a primeira vez que tiro uma ideia do papel e a transformo em algo funcionando de
+      verdade, atendendo clientes todo dia — em setores que exigem confiabilidade, integração com
+      pagamento e cuidado com dados sensíveis.
+    </p>
+  </div>
+
+  <div class="roi-grid four">
+    <div class="roi-card"><div class="roi-card-label">Experiência</div><div class="roi-card-numero">3+</div><div class="roi-card-desc">anos construindo sistemas em produção</div></div>
+    <div class="roi-card"><div class="roi-card-label">Entregas</div><div class="roi-card-numero">50+</div><div class="roi-card-desc">soluções colocadas no ar</div></div>
+    <div class="roi-card"><div class="roi-card-label">Alcance</div><div class="roi-card-numero">6</div><div class="roi-card-desc">setores diferentes atendidos</div></div>
+    <div class="roi-card"><div class="roi-card-label">Operação</div><div class="roi-card-numero">24/7</div><div class="roi-card-desc">sistemas rodando sem parar</div></div>
+  </div>
+
+  <h2>Setores onde já entreguei</h2>
+  <div class="chips">
+    <span class="chip">Saúde</span>
+    <span class="chip">Automotivo</span>
+    <span class="chip">Jurídico</span>
+    <span class="chip">Imobiliário</span>
+    <span class="chip">Educação</span>
+    <span class="chip">Fintech / Pagamentos</span>
+  </div>
+
+  <h2>Tecnologias que sustentam o KHOROS</h2>
+  <div class="intro-block" style="margin-top: 4px;">
+    <p>
+      <span class="highlight">Integrações de pagamento</span> (Pix e gateways com split),
+      <span class="highlight">Supabase / PostgreSQL</span>, automação e orquestração de processos,
+      APIs em tempo real e arquitetura de sistemas em nuvem. Para a camada de vídeo, uso infraestrutura
+      WebRTC consolidada — sem reinventar a roda, concentrando o esforço no que é o verdadeiro
+      diferencial do KHOROS: <span class="highlight">o motor de cobrança e a experiência do usuário</span>.
+    </p>
+  </div>
+</div>
+
+<!-- ========================= PÁGINA 3 — APRESENTAÇÃO ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">02 · O Projeto</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <h1 class="section-title">Sobre o projeto <strong>KHOROS</strong></h1>
+  <p class="section-subtitle">Meu entendimento da visão e a abordagem recomendada — detalhados e validados na Sprint 0.</p>
+
+  <div class="intro-block">
+    <p>
+      O KHOROS é uma <span class="highlight">plataforma de consultoria instantânea por vídeo</span>:
+      a pessoa fala com um especialista na hora, paga apenas pelos minutos que usar e mantém a privacidade
+      onde a regulação permite. É a lógica de conveniência de um app de transporte aplicada ao mercado de
+      conhecimento — telessaúde, consultoria de negócios, mentoria e jurídico.
+    </p>
+    <p>
+      As próximas páginas mostram <span class="highlight">a abordagem recomendada</span>: o que dá para
+      construir, como funciona por dentro, os cuidados de segurança e o caminho em fases até a plataforma operando.
+    </p>
+    <p>
+      <span class="highlight">Importante:</span> esta proposta reflete a visão e a estratégia com base no material que recebi.
+      O escopo detalhado, as decisões técnicas finais e os valores definitivos são transformados em decisões
+      validadas na <span class="highlight">Sprint 0 (Discovery)</span> — é assim que se garante um plano preciso,
+      sem chute e sem surpresa no meio do caminho.
+    </p>
+  </div>
+
+  <h2>Por que a tese se sustenta tecnicamente</h2>
+
+  <div class="beneficios-grid">
+    <div class="beneficio">
+      <div class="beneficio-icon">1</div>
+      <div class="beneficio-titulo">Microtransações de alto volume</div>
+      <p class="beneficio-descricao">
+        A cobrança por minuto remove a barreira da hora cheia e multiplica o número de
+        transações diárias — mais receita recorrente, não menos.
+      </p>
+    </div>
+    <div class="beneficio">
+      <div class="beneficio-icon">2</div>
+      <div class="beneficio-titulo">Conversão por impulso</div>
+      <p class="beneficio-descricao">
+        O botão "online agora" captura o cliente no segundo da necessidade e monetiza
+        o tempo ocioso do especialista, sem fricção de agenda.
+      </p>
+    </div>
+    <div class="beneficio">
+      <div class="beneficio-icon">3</div>
+      <div class="beneficio-titulo">Margem de infraestrutura limpa</div>
+      <p class="beneficio-descricao">
+        O vídeo corre ponto a ponto entre os usuários. Manter 10 ou 10.000 chamadas custa
+        quase o mesmo no servidor — modelo asset-light de margem alta.
+      </p>
+    </div>
+    <div class="beneficio">
+      <div class="beneficio-icon">4</div>
+      <div class="beneficio-titulo">Dois motores de receita</div>
+      <p class="beneficio-descricao">
+        Comissão sobre cada minuto no marketplace B2C e licenciamento white-label da
+        tecnologia para empresas (B2B) — diversificação de risco.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= PÁGINA 3 — ESCOPO ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">03 · A Solução</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <h1 class="section-title">A solução <strong>proposta</strong></h1>
+  <p class="section-subtitle">Seis módulos compõem a plataforma. O detalhamento e a prioridade de cada um (essencial vs. evolução) são fechados na Sprint 0.</p>
+
+  <div class="modulo">
+    <div class="modulo-header"><div class="modulo-titulo">
+      <div class="modulo-numero">1</div>
+      <div class="modulo-titulo-texto">
+        <div class="modulo-nome">Motor de Tarifação por Minuto</div>
+        <div class="modulo-nome-sub">O coração do produto</div>
+      </div></div></div>
+    <ul>
+      <li>Medição da sessão pelo servidor (fonte de verdade), imune à manipulação de relógio do usuário</li>
+      <li>Validação dupla por "sinal de vida" das duas pontas a cada poucos segundos</li>
+      <li>Tolerância a quedas de conexão com conciliação justa do tempo cobrado</li>
+      <li>Trilha de auditoria de cada sessão e cada cobrança</li>
+    </ul>
+  </div>
+
+  <div class="modulo">
+    <div class="modulo-header"><div class="modulo-titulo">
+      <div class="modulo-numero">2</div>
+      <div class="modulo-titulo-texto">
+        <div class="modulo-nome">Sala de Vídeo Instantânea + "Online Agora"</div>
+        <div class="modulo-nome-sub">Conexão em tempo real</div>
+      </div></div></div>
+    <ul>
+      <li>Chamada de áudio e vídeo ponto a ponto (WebRTC) direto no navegador ou app</li>
+      <li>Presença em tempo real: especialista aparece como disponível, ocupado ou offline</li>
+      <li>Conexão imediata com um toque, sem agendamento</li>
+      <li>Infraestrutura de vídeo consolidada para garantir qualidade e reconexão</li>
+    </ul>
+  </div>
+
+  <div class="modulo">
+    <div class="modulo-header"><div class="modulo-titulo">
+      <div class="modulo-numero">3</div>
+      <div class="modulo-titulo-texto">
+        <div class="modulo-nome">Carteira & Pagamentos</div>
+        <div class="modulo-nome-sub">Pix, cartão e repasse automático</div>
+      </div></div></div>
+    <ul>
+      <li>Carteira pré-paga recarregável via Pix (instantâneo, baixo custo, sem chargeback)</li>
+      <li>Débito dos minutos em tempo real conforme a sessão avança</li>
+      <li>Repasse automático ao profissional via split, já descontando a comissão da plataforma</li>
+      <li>Cartão de crédito como meio secundário, quando aplicável</li>
+    </ul>
+  </div>
+
+  <div class="modulo">
+    <div class="modulo-header"><div class="modulo-titulo">
+      <div class="modulo-numero">4</div>
+      <div class="modulo-titulo-texto">
+        <div class="modulo-nome">Marketplace de Especialistas</div>
+        <div class="modulo-nome-sub">O lado da oferta</div>
+      </div></div></div>
+    <ul>
+      <li>Cadastro e verificação de identidade dos profissionais (KYC)</li>
+      <li>Busca por área de atuação, perfis, especialidades e tarifas</li>
+      <li>Avaliações pós-consulta e reputação</li>
+      <li>Apelido (nickname) para o cliente nos nichos onde a regulação permite</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ========================= PÁGINA — A SOLUÇÃO (continuação) ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">03 · A Solução (continuação)</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <div class="modulo">
+    <div class="modulo-header"><div class="modulo-titulo">
+      <div class="modulo-numero">5</div>
+      <div class="modulo-titulo-texto">
+        <div class="modulo-nome">Camada White-Label B2B</div>
+        <div class="modulo-nome-sub">Segundo motor de receita</div>
+      </div></div></div>
+    <ul>
+      <li>Mesma tecnologia licenciada para empresas com a marca delas (multi-tenant)</li>
+      <li>Canais de atendimento instantâneo internos para clínicas, escritórios e plataformas</li>
+      <li>Painel de administração por empresa cliente</li>
+    </ul>
+  </div>
+
+  <div class="modulo">
+    <div class="modulo-header"><div class="modulo-titulo">
+      <div class="modulo-numero">6</div>
+      <div class="modulo-titulo-texto">
+        <div class="modulo-nome">Painel, Relatórios & Auditoria</div>
+        <div class="modulo-nome-sub">Controle da operação</div>
+      </div></div></div>
+    <ul>
+      <li>Acompanhamento de sessões, faturamento, comissões e ticket médio</li>
+      <li>Relatórios financeiros e de desempenho por especialista</li>
+      <li>Registro completo e rastreável de transações para conciliação</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ========================= PÁGINA 4 — ARQUITETURA ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">04 · Como Funciona por Dentro</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <h1 class="section-title">A <strong>arquitetura</strong> recomendada</h1>
+  <p class="section-subtitle">O vídeo corre direto entre as pessoas; o servidor apenas conta o tempo e organiza o pagamento. As escolhas finais de tecnologia são confirmadas na Sprint 0.</p>
+
+  <div class="arch-diagram">
+    <svg viewBox="0 0 760 210" role="img" aria-label="Fluxo da arquitetura KHOROS">
+      <defs>
+        <linearGradient id="g1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#5A46F0"/><stop offset="1" stop-color="#A894F5"/>
+        </linearGradient>
+        <marker id="ar" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9z" fill="#5A46F0"/></marker>
+        <marker id="arm" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9z" fill="#A0A0B5"/></marker>
+      </defs>
+      <rect x="20" y="70" width="160" height="66" rx="12" fill="#F5F3FF" stroke="#5A46F0"/>
+      <text x="100" y="98" text-anchor="middle" fill="#0A0A2A" font-family="Helvetica" font-weight="700" font-size="15">Cliente</text>
+      <text x="100" y="118" text-anchor="middle" fill="#6E6E85" font-family="Helvetica" font-size="11">navegador / app</text>
+      <rect x="580" y="70" width="160" height="66" rx="12" fill="#F5F3FF" stroke="#5A46F0"/>
+      <text x="660" y="98" text-anchor="middle" fill="#0A0A2A" font-family="Helvetica" font-weight="700" font-size="15">Especialista</text>
+      <text x="660" y="118" text-anchor="middle" fill="#6E6E85" font-family="Helvetica" font-size="11">navegador / app</text>
+      <line x1="180" y1="90" x2="580" y2="90" stroke="url(#g1)" stroke-width="3" marker-end="url(#ar)" marker-start="url(#ar)"/>
+      <text x="380" y="80" text-anchor="middle" fill="#5A46F0" font-family="Helvetica" font-weight="700" font-size="12">vídeo direto P2P · custo de mídia ≈ zero</text>
+      <rect x="300" y="150" width="160" height="50" rx="12" fill="#2D1B5E"/>
+      <text x="380" y="172" text-anchor="middle" fill="#fff" font-family="Helvetica" font-weight="700" font-size="12">Servidor leve</text>
+      <text x="380" y="189" text-anchor="middle" fill="#A894F5" font-family="Helvetica" font-size="8.5">conta o tempo · organiza o pagamento</text>
+      <line x1="110" y1="136" x2="320" y2="158" stroke="#A0A0B5" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arm)"/>
+      <line x1="650" y1="136" x2="440" y2="158" stroke="#A0A0B5" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arm)"/>
+    </svg>
+    <div class="arch-note">O servidor nunca vê o vídeo — só recebe um "sinal de vida" das duas pontas para medir o tempo com segurança.</div>
+  </div>
+
+  <div class="beneficios-grid">
+    <div class="beneficio">
+      <div class="beneficio-titulo">Vídeo · WebRTC + LiveKit</div>
+      <p class="beneficio-descricao">Áudio e vídeo viajam direto entre as duas pessoas. Infraestrutura barata e que escala sem servidor de streaming caro.</p>
+    </div>
+    <div class="beneficio">
+      <div class="beneficio-titulo">Tempo · Node.js + Redis</div>
+      <p class="beneficio-descricao">Servidor leve recebe os sinais das pontas e mede o tempo de forma segura, sem depender do relógio do usuário.</p>
+    </div>
+    <div class="beneficio">
+      <div class="beneficio-titulo">Pagamento · Pix + Split regulado</div>
+      <p class="beneficio-descricao">O valor é dividido na hora entre profissional e plataforma por um parceiro regulado — sem custódia própria de dinheiro.</p>
+    </div>
+    <div class="beneficio">
+      <div class="beneficio-titulo">Dados · PostgreSQL / Supabase</div>
+      <p class="beneficio-descricao">Transações, perfis e tarifas guardados com histórico completo, para conciliação e segurança financeira.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= PÁGINA 5 — SEGURANÇA ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">05 · Segurança e Conformidade</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <h1 class="section-title">Os <strong>cuidados</strong> que tratamos como prioridade</h1>
+  <p class="section-subtitle">Plataforma que mexe com vídeo, dados sensíveis e dinheiro precisa nascer madura.</p>
+
+  <div class="beneficios-grid" style="grid-template-columns: 1fr; gap: 9px;">
+    <div class="sec-card">
+      <div class="sec-titulo">Pagamento sem custódia própria</div>
+      <p class="sec-desc">Não seguramos o dinheiro de terceiros: usamos split por instituição de pagamento regulada. Isso evita exigências e riscos junto ao Banco Central e protege a operação desde o início.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-titulo">Conformidade por setor (e o caso da saúde)</div>
+      <p class="sec-desc">Cada área tem sua regra. A telessaúde, por exemplo, exige por lei a identificação do profissional (CFM) — então o anonimato é aplicado apenas nos nichos onde é permitido. A estratégia é começar pelo terreno regulatório seguro e expandir com responsabilidade.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-titulo">LGPD e criptografia</div>
+      <p class="sec-desc">Dados pessoais protegidos, consentimento registrado e mídia criptografada de ponta a ponta. Privacidade tratada como arquitetura, não como promessa de marketing.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-titulo">Antifraude no faturamento</div>
+      <p class="sec-desc">O tempo é medido pelo servidor, com tolerância a quedas e conciliação justa. O cliente nunca paga por minuto que não usou, e a plataforma não perde receita por manipulação.</p>
+    </div>
+    <div class="sec-card">
+      <div class="sec-titulo">Verificação de especialistas (KYC)</div>
+      <p class="sec-desc">Mesmo com o cliente usando apelido, o profissional é identificado e verificado — garantindo confiança, qualidade e responsabilidade nas consultas.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= PÁGINA 6 — CRONOGRAMA ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">06 · Roadmap de Desenvolvimento</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <h1 class="section-title">Do zero ao produto, em <strong>fases</strong></h1>
+  <p class="section-subtitle">Cada fase entrega algo concreto e demonstrável. Valida-se, mostra-se funcionando e só então avança.</p>
+
+  <div class="cronograma">
+    <div class="cronograma-item">
+      <div class="cronograma-semana"><span class="cronograma-semana-label">SPRINT 0</span></div>
+      <div class="cronograma-descricao">
+        <div class="cronograma-titulo">Discovery: Descoberta & Desenho · ~1 semana</div>
+        <div class="cronograma-detalhe">A fase que transforma a visão em decisões validadas: definição do nicho de partida, do modelo de pagamento e das regras de negócio; priorização do escopo (essencial vs. evolução); confirmação das escolhas técnicas e mapa de riscos; e desenho das telas principais. É aqui que o entendimento completo do produto fica fechado.</div>
+        <div class="cronograma-entrega">Entrega: protótipo navegável + escopo, arquitetura e valores fechados das próximas fases</div>
+      </div>
+    </div>
+    <div class="cronograma-item">
+      <div class="cronograma-semana"><span class="cronograma-semana-label">SPRINT 1</span></div>
+      <div class="cronograma-descricao">
+        <div class="cronograma-titulo">MVP Funcional · ~3 a 5 semanas</div>
+        <div class="cronograma-detalhe">O coração do produto: um especialista conversando com um cliente por vídeo, com carteira por Pix e cobrança por minuto funcionando de verdade.</div>
+        <div class="cronograma-entrega">Entrega: plataforma real e demonstrável — pronta para validar com usuários e investidores</div>
+      </div>
+    </div>
+    <div class="cronograma-item">
+      <div class="cronograma-semana"><span class="cronograma-semana-label">SPRINT 2</span></div>
+      <div class="cronograma-descricao">
+        <div class="cronograma-titulo">Marketplace · ~3 a 4 semanas</div>
+        <div class="cronograma-detalhe">Vários profissionais na plataforma: busca por área, status "online agora", avaliações e repasse automático via split.</div>
+        <div class="cronograma-entrega">Entrega: marketplace B2C operando com múltiplos especialistas</div>
+      </div>
+    </div>
+    <div class="cronograma-item">
+      <div class="cronograma-semana"><span class="cronograma-semana-label">SPRINT 3+</span></div>
+      <div class="cronograma-descricao">
+        <div class="cronograma-titulo">Escala & White-Label · sob escopo</div>
+        <div class="cronograma-detalhe">Versão para empresas (multi-marca), aplicativo nativo, novos nichos e camadas avançadas de antifraude e relatórios.</div>
+        <div class="cronograma-entrega">Entrega: produto pronto para crescimento e licenciamento B2B</div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Premissas para cumprimento do prazo</h2>
+  <div class="modulo">
+    <ul>
+      <li>Definição do nicho de partida e do modelo de pagamento na Sprint 0</li>
+      <li>Disponibilidade para reuniões semanais de validação — cerca de 30 minutos cada</li>
+      <li>Contratação dos serviços de terceiros (gateway de pagamento, infraestrutura de vídeo)</li>
+      <li>Acesso a um especialista piloto para validar os fluxos em operação real</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ========================= PÁGINA 7 — INVESTIMENTO ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">07 · Investimento</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <h1 class="section-title">Investir por <strong>fase</strong>, com previsibilidade</h1>
+  <p class="section-subtitle">Começa enxuto, prova o conceito, e o capital seguinte entra com a plataforma já na mão.</p>
+
+  <div class="caminhos-intro">
+    <p>
+      O investimento é estruturado <strong>por fase</strong>: começa enxuto pela Discovery, e cada etapa
+      seguinte só é paga conforme a entrega anterior é validada. Isso dilui o investimento, reduz o risco
+      e mantém o controle do orçamento a cada passo.
+    </p>
+  </div>
+
+  <div class="fases-tabela">
+    <div class="fase-linha">
+      <div class="fase-info"><div class="fase-nome">Sprint 0 — Discovery</div><div class="fase-desc">Diagnóstico, arquitetura, protótipo e proposta com valores fechados</div></div>
+      <div class="fase-prazo">~1 sem</div>
+      <div class="fase-valor">Gratuito<span style="display:block; font-size:7pt; color:#8B8B9E; font-weight:400; letter-spacing:0;">cortesia</span></div>
+    </div>
+    <div class="fase-linha">
+      <div class="fase-info"><div class="fase-nome">Sprint 1 — MVP funcional</div><div class="fase-desc">Vídeo + carteira Pix + cobrança por minuto</div></div>
+      <div class="fase-prazo">3–5 sem</div>
+      <div class="fase-valor dim">a definir na Sprint 0</div>
+    </div>
+    <div class="fase-linha">
+      <div class="fase-info"><div class="fase-nome">Sprint 2 — Marketplace</div><div class="fase-desc">Multi-especialista, busca, avaliações, split</div></div>
+      <div class="fase-prazo">3–4 sem</div>
+      <div class="fase-valor dim">a definir na Sprint 0</div>
+    </div>
+    <div class="fase-linha">
+      <div class="fase-info"><div class="fase-nome">Operação mensal</div><div class="fase-desc">Manutenção, monitoramento e suporte (infra repassada à parte)</div></div>
+      <div class="fase-prazo">recorrente</div>
+      <div class="fase-valor dim">a definir na Sprint 0</div>
+    </div>
+  </div>
+  <p class="setup-nota">A <strong>Sprint 0 (Discovery) é oferecida como cortesia, sem compromisso</strong> — um diagnóstico para alinharmos o projeto. Os valores de Sprint 1, Sprint 2 e operação mensal são definidos ao final dela, quando o escopo está detalhado — garantindo um orçamento preciso, sem chute. Infraestrutura (vídeo, banco, gateway) repassada à parte.</p>
+
+  <!-- RECOMENDADO -->
+  <div class="caminho-card recomendado">
+    <div class="caminho-header">
+      <div class="caminho-nome-bloco">
+        <div class="caminho-tag">Primeiro passo recomendado</div>
+        <div class="caminho-nome">Sprint 0 + Sprint 1 — Validação + MVP</div>
+        <div class="caminho-sub">A forma mais segura de começar: investimento controlado, plataforma real na mão para validar e captar.</div>
+      </div>
+      <div class="caminho-valor">
+        <div class="caminho-valor-numero">~ 4 a 6</div>
+        <div class="caminho-valor-sub">semanas até o MVP</div>
+      </div>
+    </div>
+    <div class="caminho-features-grid">
+      <div class="caminho-feature pro">Escopo e valores fechados antes de codar</div>
+      <div class="caminho-feature pro">Plataforma demonstrável ao fim da fase</div>
+      <div class="caminho-feature pro">Material concreto para mostrar a investidores</div>
+      <div class="caminho-feature pro">Decisão de seguir só com o conceito provado</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= PÁGINA 9 — GARANTIAS + PRÓXIMOS PASSOS ========================= -->
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-title">08 · Garantias e Próximos Passos</div>
+    <div class="page-header-brand">ELONAI AUTOMAÇÕES</div>
+  </div>
+
+  <h1 class="section-title">Compromissos e <strong>garantias</strong></h1>
+  <p class="section-subtitle">O que está assegurado na contratação.</p>
+
+  <div class="garantias-grid">
+    <div class="garantia-card">
+      <div class="garantia-titulo">Escopo por fase</div>
+      <p class="garantia-desc">Cada sprint tem escopo, prazo e valor definidos antes de começar. Sem surpresa: você aprova a fase para ela acontecer.</p>
+    </div>
+    <div class="garantia-card">
+      <div class="garantia-titulo">Contrato Formal</div>
+      <p class="garantia-desc">Documento com escopo, prazos, valores e responsabilidades de ambas as partes — assinatura digital pelo celular.</p>
+    </div>
+    <div class="garantia-card">
+      <div class="garantia-titulo">Propriedade Intelectual</div>
+      <p class="garantia-desc">Todo o sistema desenvolvido e os dados pertencem ao projeto KHOROS. O código e os acessos são seus.</p>
+    </div>
+    <div class="garantia-card">
+      <div class="garantia-titulo">Garantia de Ajustes</div>
+      <p class="garantia-desc">30 dias após cada entrega para correções e refinamentos sem custo, cobrindo divergências com o escopo acordado.</p>
+    </div>
+  </div>
+
+  <h2>Próximos passos</h2>
+  <ol class="passos-lista">
+    <li>
+      <div class="passos-titulo">Conversa de alinhamento (Sprint 0)</div>
+      <p class="passos-desc">Definimos juntos o nicho de partida, o modelo de pagamento e as regras — pessoalmente ou por chamada.</p>
+    </li>
+    <li>
+      <div class="passos-titulo">Aceite e contrato da primeira fase</div>
+      <p class="passos-desc">Assinatura digital do escopo da Sprint 0 e início do desenho da plataforma.</p>
+    </li>
+    <li>
+      <div class="passos-titulo">Kickoff do MVP</div>
+      <p class="passos-desc">Com o conceito desenhado e validado, começamos a Sprint 1 e em poucas semanas existe um KHOROS real para mostrar.</p>
+    </li>
+  </ol>
+
+  <div class="contato-final">
+    <div class="contato-final-titulo">Vamos tirar o KHOROS do papel?</div>
+    <div class="contato-final-desc">
+      Qualquer dúvida sobre escopo, prazo, valores ou funcionamento da plataforma pode ser tratada
+      diretamente. Estou à disposição para ajustar o que for necessário para o projeto encaixar na
+      realidade e no momento de investimento do KHOROS.
+    </div>
+    <div class="contato-info">
+      <strong>Contato Direto</strong>
+      Guilherme Henrique · WhatsApp (19) 98194-1604
+      <strong>Elonai Automações</strong>
+      CNPJ 55.200.585/0001-85
+    </div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
