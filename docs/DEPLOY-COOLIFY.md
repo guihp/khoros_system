@@ -60,11 +60,17 @@ Copie de `.env.example`. No Coolify, defina no **Environment** do recurso (não 
 | `SUPABASE_JWKS_URL` | `…/auth/v1/.well-known/jwks.json` |
 | `LIVEKIT_URL` / `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET` | Cloud |
 | `LIVEKIT_WEBHOOK_KEY` | Assinatura dos webhooks |
-| `ASAAS_BASE_URL` / `ASAAS_API_KEY` / `ASAAS_WEBHOOK_TOKEN` | Gateway |
+| `ASAAS_BASE_URL` / `ASAAS_API_KEY` / `ASAAS_WEBHOOK_TOKEN` | Gateway — ver nota Asaas abaixo |
 | `COLUMN_ENCRYPTION_KEY` | `openssl rand -hex 32` |
 | `WEB_ORIGIN` | URL **pública** do front, ex. `https://app.seu-dominio` (CORS) |
 
-Opcionais: `SUPABASE_PUBLISHABLE_KEY`, `SENTRY_DSN`, `BOOTSTRAP_ADMIN_EMAIL`.
+Opcionais: `SUPABASE_PUBLISHABLE_KEY`, `SENTRY_DSN`, `BOOTSTRAP_ADMIN_EMAIL`, `LIVEKIT_WEBHOOK_KEY`.
+
+**Asaas (placeholders OK):** sem sandbox/produção ainda, use `ASAAS_API_KEY=FALTA_ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN=FALTA_ASAAS_WEBHOOK_TOKEN` (mesmo padrão do `.env` local). Pix fica indisponível; o restante da API sobe. Troque por chaves reais depois e reinicie o serviço `api` (rebuild não é necessário).
+
+**Não deixe opcionais como string vazia no Coolify** (`SENTRY_DSN=`, `BOOTSTRAP_ADMIN_EMAIL=`, etc.). Melhor **omitir** a chave do que enviar `""` — strings vazias quebram validação de URL/e-mail. A API já trata `""` como unset, mas omitir evita surpresas.
+
+Se o serviço `api` ficar **unhealthy** logo após o start (~2s), é quase sempre crash no boot (env inválido), não healthcheck lento. Abra os **logs** do `api` e procure `Configuração inválida`.
 
 Em produção a API **recusa boot** se Redis não responder (sem fallback em memória).
 
