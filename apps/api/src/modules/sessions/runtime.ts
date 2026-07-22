@@ -202,15 +202,27 @@ export class SessionRuntime {
     if (psy.crp_status !== "VERIFIED") {
       return { ok: false, status: 403, code: "PSYCHOLOGIST_NOT_VERIFIED", message: "Psicólogo ainda não verificado." };
     }
+    // Split Asaas exige recebedor; em sandbox/MVP (chave FALTA… ou flag) liberamos
+    // com warning — produção com Asaas real continua bloqueando sem KYC.
     const asaasIsPlaceholder = this.env.ASAAS_API_KEY.startsWith("FALTA");
-    const devBypassRecebedor = this.env.NODE_ENV === "development" && asaasIsPlaceholder;
-    if (!psy.recebedor_gateway_id && !devBypassRecebedor) {
+    const allowWithoutRecebedor = asaasIsPlaceholder || this.env.ALLOW_SESSION_WITHOUT_RECEBEDOR;
+    if (!psy.recebedor_gateway_id && !allowWithoutRecebedor) {
       return {
         ok: false,
         status: 403,
         code: "PSYCHOLOGIST_NO_RECEIVER",
         message: "Psicólogo ainda não concluiu o onboarding financeiro.",
       };
+    }
+    if (!psy.recebedor_gateway_id && allowWithoutRecebedor) {
+      this.logger.warn(
+        {
+          psychologistId,
+          asaasIsPlaceholder,
+          allowFlag: this.env.ALLOW_SESSION_WITHOUT_RECEBEDOR,
+        },
+        "sessão sem recebedor_gateway_id (bypass sandbox/MVP)",
+      );
     }
     if (psy.disponibilidade !== "AVAILABLE") {
       return { ok: false, status: 409, code: "PSYCHOLOGIST_UNAVAILABLE", message: "Psicólogo não está disponível agora." };

@@ -40,6 +40,20 @@ const envSchema = z.object({
     emptyToUndefined,
     z.string().min(1).default("FALTA_ASAAS_WEBHOOK_TOKEN"),
   ),
+  /**
+   * MVP/sandbox: permite iniciar sessão sem `recebedor_gateway_id` mesmo com
+   * Asaas real. Com chave `FALTA…` o bypass já é automático (qualquer NODE_ENV).
+   * Em produção com Asaas real, deixe false/omitido.
+   */
+  ALLOW_SESSION_WITHOUT_RECEBEDOR: z.preprocess((value) => {
+    if (value === undefined || value === null || value === "") return false;
+    if (typeof value === "boolean") return value;
+    if (typeof value === "string") {
+      const normalized = value.trim().toLowerCase();
+      return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
+    }
+    return false;
+  }, z.boolean().default(false)),
 
   /** Chave-mestra para cifra de coluna (CPF, prontuário, segredo de heartbeat). */
   COLUMN_ENCRYPTION_KEY: z.string().length(64, "hex de 32 bytes"),

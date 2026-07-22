@@ -66,7 +66,9 @@ Copie de `.env.example`. No Coolify, defina no **Environment** do recurso (não 
 
 Opcionais: `SUPABASE_PUBLISHABLE_KEY`, `SENTRY_DSN`, `BOOTSTRAP_ADMIN_EMAIL`, `LIVEKIT_WEBHOOK_KEY`.
 
-**Asaas (placeholders OK):** sem sandbox/produção ainda, use `ASAAS_API_KEY=FALTA_ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN=FALTA_ASAAS_WEBHOOK_TOKEN` (mesmo padrão do `.env` local). Pix fica indisponível; o restante da API sobe. Troque por chaves reais depois e reinicie o serviço `api` (rebuild não é necessário).
+**Asaas (placeholders OK):** sem sandbox/produção ainda, use `ASAAS_API_KEY=FALTA_ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN=FALTA_ASAAS_WEBHOOK_TOKEN` (mesmo padrão do `.env` local). Pix fica indisponível; o restante da API sobe. Com chave `FALTA…`, sessões podem iniciar **sem** `recebedor_gateway_id` (bypass de onboarding financeiro, com warning nos logs). Troque por chaves reais depois e reinicie o serviço `api` (rebuild não é necessário).
+
+Se já tiver Asaas sandbox/produção mas quiser testar vídeo/bilhetagem sem KYC do psicólogo: `ALLOW_SESSION_WITHOUT_RECEBEDOR=true` no serviço `api`. Remova antes do go-live com split real.
 
 **Não deixe opcionais como string vazia no Coolify** (`SENTRY_DSN=`, `BOOTSTRAP_ADMIN_EMAIL=`, etc.). Melhor **omitir** a chave do que enviar `""` — strings vazias quebram validação de URL/e-mail. A API já trata `""` como unset, mas omitir evita surpresas.
 
