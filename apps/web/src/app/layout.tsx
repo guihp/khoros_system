@@ -1,30 +1,49 @@
 import type { Metadata } from "next";
+import { Fraunces, DM_Sans } from "next/font/google";
 import { SupportBanner } from "@/components/SupportBanner";
+import { AppShell } from "@/components/AppShell";
+import { AuthProvider } from "@/lib/auth-context";
+import { siteConfig } from "@/lib/blog/site";
 import "./globals.css";
 
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  variable: "--font-display",
+  axes: ["opsz", "SOFT"],
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "KHOROS — Psicologia por vídeo, quando você precisar",
-  description:
-    "Converse com um psicólogo verificado, por vídeo, pagando apenas os minutos que usar.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: `${siteConfig.name} — Saúde mental e psicologia`,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  openGraph: {
+    type: "website",
+    locale: siteConfig.locale,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.name,
+    description: siteConfig.description,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={`${fraunces.variable} ${dmSans.variable}`}>
       <body className="min-h-dvh flex flex-col">
         <SupportBanner />
-        <div className="flex-1">{children}</div>
-        <footer className="px-4 py-6 text-center text-xs text-calm-600 border-t border-calm-200">
-          {/* Inscrição PJ no CRP e Responsável Técnico: valores vêm de platform_settings */}
-          <p>KHOROS · Plataforma de psicologia por vídeo</p>
-          <p className="mt-1">
-            Pessoa jurídica inscrita no CRP · Responsável Técnico(a): a definir — CRP nº a definir
-          </p>
-          <p className="mt-1">
-            Este serviço não substitui atendimento de urgência. Em crise, ligue{" "}
-            <strong>CVV 188</strong> ou <strong>SAMU 192</strong>.
-          </p>
-        </footer>
+        <AuthProvider>
+          <AppShell>{children}</AppShell>
+        </AuthProvider>
       </body>
     </html>
   );

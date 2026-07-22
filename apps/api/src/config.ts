@@ -13,8 +13,12 @@ const envSchema = z.object({
   REDIS_URL: z.string().url(),
 
   SUPABASE_URL: z.string().url(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  SUPABASE_JWT_SECRET: z.string().min(1),
+  /** Chave secreta (sb_secret_…) — server-only. Nunca no front. */
+  SUPABASE_SECRET_KEY: z.string().min(1),
+  /** Publishable (sb_publishable_…) — opcional na API; usada no web. */
+  SUPABASE_PUBLISHABLE_KEY: z.string().min(1).optional(),
+  /** JWKS do Auth — verificação de JWT assimétrico (sem JWT secret legado). */
+  SUPABASE_JWKS_URL: z.string().url(),
 
   LIVEKIT_URL: z.string().url(),
   LIVEKIT_API_KEY: z.string().min(1),
@@ -30,6 +34,18 @@ const envSchema = z.object({
 
   SENTRY_DSN: z.string().url().optional(),
   WEB_ORIGIN: z.string().url().default("http://localhost:3000"),
+
+  /**
+   * Caminhos opcionais para cert/key HTTPS locais (gerados por
+   * scripts/gen-certs.sh). Só usados em dev, para testar no celular: uma
+   * página HTTPS não pode chamar uma API HTTP (mixed content) e
+   * navigator.mediaDevices exige contexto seguro. Ver `pnpm dev:https`.
+   */
+  HTTPS_KEY_FILE: z.string().optional(),
+  HTTPS_CERT_FILE: z.string().optional(),
+
+  /** Se definido, o primeiro POST /auth/register com este e-mail pode se cadastrar como ADMIN. */
+  BOOTSTRAP_ADMIN_EMAIL: z.string().email().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

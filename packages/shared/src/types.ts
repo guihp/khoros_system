@@ -38,6 +38,8 @@ export type SessionServerEvent =
   | { type: "critical_balance"; remainingMinutes: number }
   | { type: "ending_soon"; reason: "NO_BALANCE"; graceMs: number }
   | { type: "session_ended"; reason: EndReason; paidSeconds: number; totalCents: number }
+  /** Sessão terminada ainda em PENDING (recusa, timeout de aceite ou cancelamento) — nunca chegou a cobrar. */
+  | { type: "session_cancelled"; reason: EndReason }
   | { type: "incoming_call"; sessionId: string; patientNickname: string; timeoutMs: number };
 
 /** Heartbeat cliente → servidor. Timestamps do cliente são ignorados de propósito. */

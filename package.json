@@ -8,6 +8,8 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:https": "turbo dev:https",
+    "gen-certs": "bash scripts/gen-certs.sh",
     "lint": "turbo lint",
     "test": "turbo test",
     "typecheck": "turbo typecheck"

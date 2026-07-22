@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
+    "dev:https": "HTTPS_KEY_FILE=../../certificates/khoros-key.pem HTTPS_CERT_FILE=../../certificates/khoros-cert.pem tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -12,13 +13,16 @@
   },
   "dependencies": {
     "@fastify/cors": "^11.0.1",
+    "@fastify/multipart": "^9.4.0",
     "@fastify/rate-limit": "^10.3.0",
     "@fastify/websocket": "^11.1.0",
     "@khoros/shared": "workspace:*",
     "@supabase/supabase-js": "^2.50.0",
     "bullmq": "^5.56.0",
+    "dotenv": "^17.4.2",
     "fastify": "^5.4.0",
     "ioredis": "^5.6.1",
+    "jose": "^6.2.3",
     "livekit-server-sdk": "^2.13.0",
     "pino": "^9.7.0",
     "zod": "^3.25.67"

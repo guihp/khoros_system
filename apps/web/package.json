@@ -4,15 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:https": "next dev --experimental-https --experimental-https-key ../../certificates/khoros-key.pem --experimental-https-cert ../../certificates/khoros-cert.pem --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@khoros/shared": "workspace:*",
+    "@supabase/ssr": "^0.12.2",
+    "@supabase/supabase-js": "^2.110.5",
+    "date-fns": "^4.4.0",
+    "gray-matter": "^4.0.3",
+    "livekit-client": "^2.20.1",
     "next": "^15.3.4",
+    "next-mdx-remote": "^5.0.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "reading-time": "^1.5.0",
+    "zod": "^3.25.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.10",

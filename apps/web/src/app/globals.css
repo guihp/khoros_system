@@ -32,7 +32,23 @@
   --color-warn-100: #fdf3e0;
   --color-warn-700: #8a5a12;
 
-  --font-sans: var(--font-geist, ui-sans-serif), system-ui, -apple-system, sans-serif;
+  /* Tokens do blog (marketing) — alinhados ao site Onda 0 */
+  --color-background: #f8fafb;
+  --color-foreground: #1e293b;
+  --color-khoros-cyan: #00e5ff;
+  --color-khoros-cyan-dark: #00b4d8;
+  --color-khoros-teal: #48cae4;
+  --color-khoros-mint: #e8f8f5;
+  --color-khoros-sage: #d4edda;
+  --color-khoros-slate: #64748b;
+  --color-khoros-warm: #fef9f3;
+  --color-card: #ffffff;
+  --color-border: #e2e8f0;
+  --color-muted: #f1f5f9;
+
+  --font-sans: var(--font-body, ui-sans-serif), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-display, "Fraunces", ui-serif), Georgia, serif;
+  --font-serif: var(--font-source-serif, "Source Serif 4", ui-serif), Georgia, serif;
 
   --radius-card: 1rem;
 }
@@ -44,4 +60,70 @@ html {
 body {
   background-color: var(--color-calm-50);
   color: var(--color-calm-900);
+  font-family: var(--font-sans);
+}
+
+/* Atmosfera calma para composições full-bleed — nunca flat, nunca fintech. */
+.atmosphere-hero {
+  background-image:
+    radial-gradient(60% 55% at 18% 8%, color-mix(in srgb, var(--color-brand-100) 70%, transparent) 0%, transparent 65%),
+    radial-gradient(55% 50% at 90% 12%, color-mix(in srgb, var(--color-sage-100) 65%, transparent) 0%, transparent 70%),
+    linear-gradient(180deg, var(--color-calm-50) 0%, #ffffff 55%, var(--color-calm-50) 100%);
+}
+
+.atmosphere-panel {
+  background-image:
+    radial-gradient(45% 65% at 50% 0%, color-mix(in srgb, var(--color-brand-100) 55%, transparent) 0%, transparent 70%),
+    linear-gradient(160deg, var(--color-sage-100) 0%, var(--color-brand-50) 55%, var(--color-calm-50) 100%);
+}
+
+@keyframes drift-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(1.5%, -2%, 0) scale(1.03);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-drift-slow {
+  animation: drift-slow 16s ease-in-out infinite;
+}
+
+.animate-rise-in {
+  animation: rise-in 0.7s ease-out both;
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift-slow,
+  .animate-rise-in,
+  .animate-pulse-soft {
+    animation: none;
+  }
 }

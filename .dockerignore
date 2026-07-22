@@ -1,0 +1,39 @@
+# Dependências e artefatos de build (reinstalados / regenerados no Docker)
+node_modules
+**/node_modules
+dist
+**/dist
+.next
+**/.next
+.turbo
+**/.turbo
+*.tsbuildinfo
+coverage
+**/coverage
+
+# Segredos e ambiente local — NUNCA ir para a imagem
+.env
+.env.*
+!.env.example
+certificates
+
+# Git / IDE / OS
+.git
+.gitignore
+.mcp.json
+.DS_Store
+**/.DS_Store
+.vscode
+.idea
+
+# Docs e assets pesados irrelevantes ao runtime
+*.pdf
+blog-khoros
+docs
+scripts
+proposta-elonai-khoros_1.html
+CLAUDE.md
+
+# Testes (não precisam na imagem de produção)
+**/*.test.ts
+**/vitest.config.*

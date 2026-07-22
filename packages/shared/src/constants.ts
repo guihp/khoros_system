@@ -35,6 +35,14 @@ export const ZERO_BALANCE_GRACE_MS = 30_000;
 /** Timeout para o psicólogo aceitar a chamada entrante (ms). */
 export const CALL_ACCEPT_TIMEOUT_MS = 30_000;
 
+/**
+ * Backup de polling: enquanto a sessão está PENDING (sala de espera do
+ * paciente), consulta GET /sessions/:id neste intervalo para o caso do
+ * evento WS de recusa/cancelamento se perder (conexão ainda não
+ * estabelecida, socket caiu, etc.).
+ */
+export const PENDING_STATUS_POLL_MS = 4_000;
+
 /** Take rate padrão da plataforma (fração). Configurável por profissional. */
 export const DEFAULT_TAKE_RATE = 0.2;
 
@@ -44,6 +52,12 @@ export const TOPUP_PACKAGES_CENTS = [5_000, 10_000, 20_000] as const;
 /** Recarga por valor livre: limites em centavos. */
 export const TOPUP_MIN_CENTS = 1_000;
 export const TOPUP_MAX_CENTS = 200_000;
+
+/** Limite de caracteres da bio pública do psicólogo. */
+export const BIO_MAX_LENGTH = 500;
+
+/** Limite do arquivo de avatar do psicólogo (bytes). */
+export const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 
 /**
  * Canais de emergência exibidos quando a triagem de crise bloqueia a consulta.
