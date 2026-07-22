@@ -9,9 +9,9 @@ function formatDuration(totalSeconds: number): string {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
-function CameraOffIcon() {
+function CameraOffIcon({ className = "h-6 w-6" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6" aria-hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={className} aria-hidden>
       <path
         d="M3 7.5a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-9Z"
         strokeLinecap="round"
@@ -21,6 +21,13 @@ function CameraOffIcon() {
       <path d="M2 2l20 20" strokeLinecap="round" />
     </svg>
   );
+}
+
+function initialsFromLabel(label: string): string {
+  const parts = label.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
 }
 
 /** Card compacto de aviso de mídia sobre o palco de vídeo — nunca empurra o layout. */
@@ -34,11 +41,11 @@ function MediaErrorCard({
   const isInsecure = mediaError.type === "insecure-context";
   return (
     <div className="absolute inset-x-3 top-14 z-20 sm:inset-x-auto sm:left-1/2 sm:top-16 sm:w-[26rem] sm:-translate-x-1/2">
-      <div className="rounded-card border border-warn-100 bg-white/95 p-4 text-center shadow-lg backdrop-blur">
-        <p className="text-sm font-medium text-calm-900">
+      <div className="rounded-2xl border border-white/10 bg-black/80 p-4 text-center shadow-lg backdrop-blur">
+        <p className="text-sm font-medium text-white">
           {isInsecure ? "Câmera e microfone indisponíveis" : "Sem acesso à câmera/microfone"}
         </p>
-        <p className="mt-1.5 text-xs leading-relaxed text-calm-600">{mediaError.message}</p>
+        <p className="mt-1.5 text-xs leading-relaxed text-white/70">{mediaError.message}</p>
         {!isInsecure && (
           <button
             type="button"
@@ -53,6 +60,33 @@ function MediaErrorCard({
   );
 }
 
+function VideoPlaceholder({
+  label,
+  initials,
+  hint,
+}: {
+  label: string;
+  initials: string;
+  hint?: string;
+}) {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1a222c] px-6 text-center">
+      <span
+        className="flex h-20 w-20 items-center justify-center rounded-full bg-[#2a3542] text-2xl font-semibold tracking-wide text-white/90 sm:h-24 sm:w-24 sm:text-3xl"
+        aria-hidden
+      >
+        {initials}
+      </span>
+      <p className="text-sm font-medium text-white/90">{label}</p>
+      {hint && <p className="text-xs text-white/55">{hint}</p>}
+    </div>
+  );
+}
+
+/**
+ * Palco estilo Meet: fundo escuro, tile 16:9 centrado (remoto ou local),
+ * PIP local quando há remoto, placeholders com iniciais — sem faixa cinza morta.
+ */
 export function SessionMediaStage({
   connected,
   suspended,
@@ -60,6 +94,9 @@ export function SessionMediaStage({
   remoteVideoRef,
   localVideoRef,
   camEnabled,
+  remoteVideoActive,
+  remoteLabel = "Profissional",
+  localLabel = "Você",
   mediaError,
   onRetryMedia,
   paidSeconds,
@@ -73,6 +110,9 @@ export function SessionMediaStage({
   remoteVideoRef: (el: HTMLVideoElement | null) => void;
   localVideoRef: (el: HTMLVideoElement | null) => void;
   camEnabled: boolean;
+  remoteVideoActive: boolean;
+  remoteLabel?: string;
+  localLabel?: string;
   mediaError: MediaErrorInfo | null;
   onRetryMedia: () => void;
   paidSeconds: number;
@@ -82,67 +122,116 @@ export function SessionMediaStage({
   const showLocalPlaceholder = !camEnabled || Boolean(mediaError);
   const reconnecting = suspended || !wsConnected;
   const statusLabel = !wsConnected ? "Reconectando…" : suspended ? "Reconectando…" : "Consulta em andamento";
+  const localInitials = initialsFromLabel(localLabel);
+  /** Sem remoto: local ocupa o tile principal (Meet). */
+  const localIsMain = !remoteVideoActive;
+  const localMainHint = !connected
+    ? "Aguardando vídeo…"
+    : mediaError
+      ? "Sem permissão de câmera"
+      : !camEnabled
+        ? "Câmera desligada"
+        : "Aguardando vídeo…";
+  const showLocalMainPlaceholder = showLocalPlaceholder || !connected;
 
   return (
-    <div className="relative mx-3 mt-3 flex-1 overflow-hidden rounded-card bg-calm-900 sm:mx-4 sm:mt-4">
-      <video ref={remoteVideoRef} autoPlay playsInline className="h-full w-full object-cover" />
-
-      {!connected && (
-        <div className="absolute inset-0 flex items-center justify-center px-6 text-center text-sm text-calm-100">
-          Aguardando conexão de vídeo…
-        </div>
-      )}
-
-      {connected && reconnecting && (
-        <div className="absolute inset-0 flex items-center justify-center bg-calm-900/70 px-6 text-center text-sm text-calm-50">
-          {suspended
-            ? "Reconectando… sua consulta está pausada e não está sendo cobrada."
-            : "Conexão instável — tentando reconectar. O cronômetro está pausado até voltar."}
-        </div>
-      )}
-
-      {/* Barra superior: status calmo + cronômetro/custo, discretos sobre o vídeo. */}
-      <div className="absolute inset-x-3 top-3 z-10 flex items-center justify-between gap-2 sm:inset-x-4">
-        <span className="rounded-full bg-black/40 px-3 py-1 text-xs text-calm-50 backdrop-blur">
+    <div className="relative flex min-h-0 flex-1 flex-col bg-[#0f1419]">
+      {/* Barra superior: status + cronômetro/custo */}
+      <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-2 px-3 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-5">
+        <span className="rounded-full bg-black/50 px-3 py-1 text-xs text-white/90 backdrop-blur">
           {statusLabel}
         </span>
-        <span className="rounded-full bg-black/40 px-3 py-1 text-xs text-calm-50 backdrop-blur">
+        <span className="rounded-full bg-black/50 px-3 py-1 text-xs text-white/90 backdrop-blur">
           {formatDuration(paidSeconds)} · {formatBRL(accruedCents)}
         </span>
       </div>
 
-      {mediaError && <MediaErrorCard mediaError={mediaError} onRetry={onRetryMedia} />}
+      {/* Área do tile — preenche o espaço útil acima do dock */}
+      <div className="flex min-h-0 flex-1 items-center justify-center px-3 pb-2 pt-14 sm:px-6 sm:pb-3 sm:pt-16">
+        <div className="relative h-full max-h-[min(100%,40rem)] w-full max-w-[1100px] overflow-hidden rounded-2xl bg-[#1a222c] shadow-2xl shadow-black/40 aspect-[9/16] sm:aspect-video sm:h-auto sm:max-h-none">
+          {/* Tile principal: remoto se presente, senão local */}
+          {localIsMain ? (
+            <>
+              <video
+                ref={localVideoRef}
+                autoPlay
+                playsInline
+                muted
+                className={`h-full w-full object-cover ${showLocalMainPlaceholder ? "hidden" : ""}`}
+              />
+              {/* remote ref ainda montado (oculto) para attach quando chegar */}
+              <video ref={remoteVideoRef} autoPlay playsInline className="pointer-events-none absolute h-0 w-0 opacity-0" />
+              {showLocalMainPlaceholder && (
+                <VideoPlaceholder label={localLabel} initials={localInitials} hint={localMainHint} />
+              )}
+              {!showLocalMainPlaceholder && (
+                <span className="absolute bottom-3 left-3 rounded-md bg-black/50 px-2 py-0.5 text-xs text-white/90 backdrop-blur">
+                  {localLabel}
+                </span>
+              )}
+              {connected && !remoteVideoActive && camEnabled && !mediaError && (
+                <p className="absolute bottom-3 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/50 px-3 py-1 text-xs text-white/75 backdrop-blur">
+                  Aguardando o outro lado…
+                </p>
+              )}
+            </>
+          ) : (
+            <>
+              <video ref={remoteVideoRef} autoPlay playsInline className="h-full w-full object-cover" />
+              <span className="absolute bottom-3 left-3 rounded-md bg-black/50 px-2 py-0.5 text-xs text-white/90 backdrop-blur">
+                {remoteLabel}
+              </span>
 
-      {/* PIP local — canto inferior direito, com placeholder quando não há vídeo local. */}
-      <div className="absolute bottom-3 right-3 h-32 w-24 overflow-hidden rounded-md border border-calm-100/40 shadow-lg sm:h-40 sm:w-28">
-        <video
-          ref={localVideoRef}
-          autoPlay
-          playsInline
-          muted
-          className={`h-full w-full object-cover ${showLocalPlaceholder ? "hidden" : ""}`}
-        />
-        {showLocalPlaceholder && (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 bg-calm-800 text-calm-100">
-            <CameraOffIcon />
-            <span className="px-1 text-center text-[0.65rem] leading-tight text-calm-200">
-              {mediaError ? "Sem permissão" : "Câmera off"}
-            </span>
-          </div>
-        )}
-      </div>
+              {/* PIP local — canto inferior direito */}
+              <div className="absolute bottom-3 right-3 z-10 h-[5.5rem] w-[4.25rem] overflow-hidden rounded-xl border border-white/20 shadow-lg sm:bottom-4 sm:right-4 sm:h-[7.5rem] sm:w-[11.25rem]">
+                <video
+                  ref={localVideoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className={`h-full w-full object-cover ${showLocalPlaceholder ? "hidden" : ""}`}
+                />
+                {showLocalPlaceholder && (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-[#2a3542] text-white/80">
+                    <CameraOffIcon className="h-5 w-5" />
+                    <span className="px-1 text-center text-[0.6rem] leading-tight">
+                      {mediaError ? "Sem permissão" : "Câmera off"}
+                    </span>
+                  </div>
+                )}
+                <span className="absolute bottom-1 left-1 rounded bg-black/55 px-1.5 py-0.5 text-[0.6rem] text-white/90">
+                  {localLabel}
+                </span>
+              </div>
+            </>
+          )}
 
-      {/* Toast fino de aviso de saldo — sobre o vídeo, ancorado à esquerda para não brigar com o PIP, nunca empurra o palco. */}
-      {warning && (
-        <div className="absolute bottom-3 left-3 z-10 max-w-[calc(100%-7.5rem)] sm:left-4 sm:max-w-[calc(100%-9rem)]">
-          <div
-            role="status"
-            className="rounded-full border border-warn-100 bg-warn-100/95 px-4 py-1.5 text-left text-xs font-medium text-warn-700 shadow-sm backdrop-blur"
-          >
-            {warning}
-          </div>
+          {connected && reconnecting && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/70 px-6 text-center text-sm text-white">
+              {suspended
+                ? "Reconectando… sua consulta está pausada e não está sendo cobrada."
+                : "Conexão instável — tentando reconectar. O cronômetro está pausado até voltar."}
+            </div>
+          )}
+
+          {mediaError && <MediaErrorCard mediaError={mediaError} onRetry={onRetryMedia} />}
+
+          {warning && (
+            <div
+              className={`absolute z-10 max-w-[min(18rem,calc(100%-6rem))] sm:max-w-sm ${
+                remoteVideoActive ? "bottom-3 left-3 sm:bottom-4" : "bottom-12 left-3 sm:bottom-4"
+              }`}
+            >
+              <div
+                role="status"
+                className="rounded-full border border-amber-200/30 bg-amber-100/95 px-4 py-1.5 text-left text-xs font-medium text-amber-900 shadow-sm backdrop-blur"
+              >
+                {warning}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -78,12 +78,27 @@ const PERMISSION_DENIED_MESSAGE =
 
 const PERMISSION_DENIED_CONTINUES_MESSAGE = `${PERMISSION_DENIED_MESSAGE} A consulta continua — o outro lado ainda pode te ouvir se você liberar o acesso.`;
 
+interface SessionCredentials {
+  livekitUrl: string;
+  livekitToken: string;
+  hbSecret: string;
+}
+
+export interface UseSessionRoomOptions {
+  /**
+   * Paciente: não conecta LiveKit até `joinSession()` (lobby “Pronto para entrar?”).
+   * Psicólogo: `false` — entra direto na sala após ACTIVE.
+   */
+  requirePreJoin?: boolean;
+}
+
 /**
  * Conecta a sala LiveKit da sessão, abre o canal de heartbeat (WS assinado por
  * HMAC) e escuta os eventos do motor de bilhetagem. Compartilhado pela sala do
  * paciente e do psicólogo — a única fonte de verdade do tempo é o servidor.
  */
-export function useSessionRoom(sessionId: string) {
+export function useSessionRoom(sessionId: string, options: UseSessionRoomOptions = {}) {
+  const { requirePreJoin = false } = options;
   const { session, user, me } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -104,6 +119,11 @@ export function useSessionRoom(sessionId: string) {
   const [camEnabled, setCamEnabled] = useState(cameraDefaultOn);
   /** Câmera/mic bloqueados (contexto inseguro ou permissão negada) — não é fatal: a sessão e a bilhetagem continuam. */
   const [mediaError, setMediaError] = useState<MediaErrorInfo | null>(null);
+  /** Paciente só publica após o CTA do lobby; psicólogo já entra com true. */
+  const [hasJoined, setHasJoined] = useState(!requirePreJoin);
+  const [joining, setJoining] = useState(false);
+  /** Há vídeo remoto inscrito (para tile Meet: local vira principal se false). */
+  const [remoteVideoActive, setRemoteVideoActive] = useState(false);
 
   const roomRef = useRef<Room | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -112,6 +132,14 @@ export function useSessionRoom(sessionId: string) {
   const wsReconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wsReconnectAttemptRef = useRef(0);
   const [wsConnected, setWsConnected] = useState(true);
+  const credentialsRef = useRef<SessionCredentials | null>(null);
+  const livekitConnectingRef = useRef(false);
+  const hasJoinedRef = useRef(hasJoined);
+  hasJoinedRef.current = hasJoined;
+  const micEnabledRef = useRef(micEnabled);
+  micEnabledRef.current = micEnabled;
+  const camEnabledRef = useRef(camEnabled);
+  camEnabledRef.current = camEnabled;
 
   // Elementos <video> e tracks locais/remotas são guardados em refs (não em
   // state) porque anexar mídia é imperativo e não deve disparar re-render.
@@ -123,6 +151,8 @@ export function useSessionRoom(sessionId: string) {
   const remoteVideoElRef = useRef<HTMLVideoElement | null>(null);
   const localVideoTrackRef = useRef<LocalVideoTrack | null>(null);
   const remoteVideoTrackRef = useRef<RemoteTrack | null>(null);
+  /** Preview getUserMedia do lobby (antes do LiveKit) — parado no join. */
+  const lobbyStreamRef = useRef<MediaStream | null>(null);
 
   const attachLocalTrack = useCallback(() => {
     const track = localVideoTrackRef.current;
@@ -153,6 +183,15 @@ export function useSessionRoom(sessionId: string) {
     [attachRemoteTrack],
   );
 
+  const stopLobbyPreview = useCallback(() => {
+    lobbyStreamRef.current?.getTracks().forEach((t) => t.stop());
+    lobbyStreamRef.current = null;
+    const el = localVideoElRef.current;
+    if (el && !localVideoTrackRef.current) {
+      el.srcObject = null;
+    }
+  }, []);
+
   /**
    * Desliga tudo que ainda estiver vivo (heartbeat, WS, sala LiveKit) — chamado
    * sempre que a sessão termina, para nunca deixar câmera/mic ou bilhetagem
@@ -173,15 +212,18 @@ export function useSessionRoom(sessionId: string) {
       wsRef.current.close();
     }
     wsRef.current = null;
+    stopLobbyPreview();
     localVideoTrackRef.current?.detach();
     localVideoTrackRef.current = null;
     remoteVideoTrackRef.current?.detach();
     remoteVideoTrackRef.current = null;
     void roomRef.current?.disconnect();
     roomRef.current = null;
+    livekitConnectingRef.current = false;
     setConnected(false);
+    setRemoteVideoActive(false);
     setWsConnected(true);
-  }, []);
+  }, [stopLobbyPreview]);
 
   /**
    * Aplica um status terminal vindo do GET /sessions/:id (usado no fallback de
@@ -210,6 +252,18 @@ export function useSessionRoom(sessionId: string) {
     [sessionId, teardown],
   );
 
+  /** Sync de ACTIVE/SUSPENDED a partir do GET (poll) — cobre perda do push WS. */
+  const applyActiveStatus = useCallback(
+    (detail: Pick<SessionDetail, "status" | "segundos_cobrados" | "valor_total_centavos">) => {
+      if (detail.status !== "ACTIVE" && detail.status !== "SUSPENDED") return false;
+      setStatus(detail.status);
+      if (detail.segundos_cobrados != null) setPaidSeconds(detail.segundos_cobrados);
+      if (detail.valor_total_centavos != null) setAccruedCents(detail.valor_total_centavos);
+      return true;
+    },
+    [],
+  );
+
   const handleServerEvent = useCallback(
     (msg: SessionServerEvent) => {
       switch (msg.type) {
@@ -217,6 +271,13 @@ export function useSessionRoom(sessionId: string) {
           setStatus(msg.status);
           setPaidSeconds(msg.paidSeconds);
           setAccruedCents(msg.accruedCents);
+          if (msg.status === "ACTIVE" || msg.status === "SUSPENDED") {
+            // Stage pode ter acabado de montar após PENDING — força re-attach.
+            queueMicrotask(() => {
+              attachLocalTrack();
+              attachRemoteTrack();
+            });
+          }
           break;
         case "low_balance":
           setWarning(`Saldo baixo: restam cerca de ${msg.remainingMinutes} min.`);
@@ -243,9 +304,10 @@ export function useSessionRoom(sessionId: string) {
           break;
       }
     },
-    [sessionId, teardown],
+    [sessionId, teardown, attachLocalTrack, attachRemoteTrack],
   );
 
+  /** Bootstrap: GET + WS. LiveKit só depois de `hasJoined` (ver efeito separado). */
   useEffect(() => {
     const token = session?.access_token;
     const userId = user?.id;
@@ -254,17 +316,12 @@ export function useSessionRoom(sessionId: string) {
 
     (async () => {
       try {
-        // Credenciais salvas em /sessions/start (paciente) ou /sessions/:id/accept
-        // (psicólogo) são a fonte principal — GET /sessions/:id é só fallback
-        // best-effort (só tem token se o runtime ainda tiver a sessão em memória).
         const stored = readSessionCredentials(sessionId);
         const detail = await fetchApi<SessionDetail>(`/sessions/${sessionId}`, { token });
         if (unmounted) return;
         setStatus(detail.status);
+        if (detail.segundos_cobrados != null) setPaidSeconds(detail.segundos_cobrados);
 
-        // A sessão já foi recusada/cancelada/encerrada antes desta página
-        // terminar de carregar (ex.: psicólogo recusou enquanto o paciente
-        // ainda pedia permissão de câmera) — nem tenta conectar à sala.
         if (applyTerminalStatus(detail)) {
           setLoading(false);
           return;
@@ -283,90 +340,8 @@ export function useSessionRoom(sessionId: string) {
           throw new Error("Sessão sem credenciais de vídeo. Tente novamente em alguns segundos.");
         }
 
-        const room = new Room();
-        roomRef.current = room;
+        credentialsRef.current = { livekitUrl, livekitToken, hbSecret };
 
-        // Re-anexar (nunca "anexar uma vez só") é o que garante vídeo local/remoto
-        // sobrevivendo a: ref de <video> montando depois da track chegar (ex.:
-        // paciente ainda na sala de espera quando a track é publicada), troca de
-        // câmera, e reconexões do LiveKit (Reconnected re-attacha as duas pontas).
-        room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack) => {
-          if (track.kind === Track.Kind.Video) {
-            remoteVideoTrackRef.current = track;
-            attachRemoteTrack();
-          } else if (track.kind === Track.Kind.Audio) {
-            track.attach();
-          }
-        });
-        room.on(RoomEvent.TrackUnsubscribed, (track: RemoteTrack) => {
-          if (track.kind === Track.Kind.Video && remoteVideoTrackRef.current === track) {
-            track.detach();
-            remoteVideoTrackRef.current = null;
-          }
-        });
-        room.on(RoomEvent.LocalTrackPublished, (publication) => {
-          if (publication.track?.kind === Track.Kind.Video) {
-            localVideoTrackRef.current = publication.track as LocalVideoTrack;
-            attachLocalTrack();
-          }
-        });
-        room.on(RoomEvent.LocalTrackUnpublished, (publication) => {
-          if (publication.track && localVideoTrackRef.current === publication.track) {
-            localVideoTrackRef.current = null;
-          }
-        });
-        room.on(RoomEvent.MediaDevicesError, () => {
-          setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_CONTINUES_MESSAGE });
-        });
-        // Quedas de rede: o LiveKit já tenta reconectar sozinho (ICE restart /
-        // re-join de sinalização) — só refletimos o estado na UI ("Aguardando
-        // conexão de vídeo…"), nunca derrubamos a sala nós mesmos por uma
-        // interrupção transitória.
-        room.on(RoomEvent.Reconnecting, () => setConnected(false));
-        room.on(RoomEvent.Reconnected, () => {
-          setConnected(true);
-          attachLocalTrack();
-          attachRemoteTrack();
-        });
-        room.on(RoomEvent.Disconnected, () => setConnected(false));
-
-        await room.connect(livekitUrl, livekitToken);
-        if (unmounted) {
-          await room.disconnect();
-          return;
-        }
-        setConnected(true);
-
-        // A conexão com a sala (sinalização) não depende de getUserMedia —
-        // só a captura de câmera/mic locais. Isolamos essa etapa para que um
-        // contexto inseguro ou permissão negada não derrube a sessão inteira
-        // (paciente/psicólogo ainda conseguem ver o outro lado e a bilhetagem
-        // continua correndo normalmente).
-        if (!hasMediaDevicesSupport()) {
-          setMediaError({ type: "insecure-context", message: INSECURE_CONTEXT_MESSAGE });
-          setMicEnabled(false);
-          setCamEnabled(false);
-        } else {
-          try {
-            const enableCam = cameraDefaultOnRef.current;
-            await room.localParticipant.setMicrophoneEnabled(true);
-            await room.localParticipant.setCameraEnabled(enableCam);
-            setCamEnabled(enableCam);
-            const camPub = Array.from(room.localParticipant.videoTrackPublications.values())[0];
-            if (camPub?.videoTrack) {
-              localVideoTrackRef.current = camPub.videoTrack as LocalVideoTrack;
-              attachLocalTrack();
-            }
-          } catch {
-            setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_CONTINUES_MESSAGE });
-            setMicEnabled(false);
-            setCamEnabled(false);
-          }
-        }
-
-        // WS de heartbeat: função reaproveitável para (re)conectar. Uma queda
-        // transitória de rede não pode congelar o relógio da sessão para
-        // sempre — reconectamos com backoff enquanto a sessão não terminar.
         const connectWs = () => {
           if (unmounted) return;
           const ws = new WebSocket(`${apiWsUrl("/ws")}?token=${encodeURIComponent(token)}`);
@@ -386,9 +361,11 @@ export function useSessionRoom(sessionId: string) {
             setWsConnected(true);
             if (heartbeatTimerRef.current) clearInterval(heartbeatTimerRef.current);
             heartbeatTimerRef.current = setInterval(async () => {
+              const creds = credentialsRef.current;
+              if (!creds) return;
               const seq = seqRef.current++;
               try {
-                const hmac = await hmacSha256Hex(hbSecret, `${sessionId}:${userId}:${seq}`);
+                const hmac = await hmacSha256Hex(creds.hbSecret, `${sessionId}:${userId}:${seq}`);
                 ws.send(JSON.stringify({ type: "heartbeat", sessionId, seq, hmac }));
               } catch {
                 // Falha ao assinar não deve travar o loop; próximo tick tenta de novo.
@@ -396,9 +373,6 @@ export function useSessionRoom(sessionId: string) {
             }, HEARTBEAT_INTERVAL_MS);
           };
 
-          // O evento `error` de WebSocket é um `Event` puro (nunca um Error) e
-          // nunca deve ser relançado/rejeitado como está — o `close` que o
-          // segue é quem faz o trabalho real de sinalizar/reconectar.
           ws.onerror = () => {
             setWsConnected(false);
           };
@@ -410,7 +384,6 @@ export function useSessionRoom(sessionId: string) {
               heartbeatTimerRef.current = null;
             }
             if (unmounted) return;
-            // 4401: token inválido/expirado (ver ws.ts) — reconectar não ajuda.
             if (evt.code === 4401) {
               setError("Sua sessão expirou. Recarregue a página para continuar.");
               return;
@@ -448,25 +421,146 @@ export function useSessionRoom(sessionId: string) {
         wsRef.current.onerror = null;
         wsRef.current.close();
       }
+      stopLobbyPreview();
       localVideoTrackRef.current?.detach();
       remoteVideoTrackRef.current?.detach();
       void roomRef.current?.disconnect();
+      roomRef.current = null;
     };
-    // Dependemos do TOKEN/ID (primitivos), não dos objetos `session`/`user`:
-    // o cliente Supabase emite `onAuthStateChange` com uma NOVA instância de
-    // `Session`/`User` (mesmo access_token) em eventos como o app voltar a
-    // ficar visível/foco de aba — se dependêssemos dos objetos, cada um
-    // desses eventos derrubaria e reconectaria sala/câmera/WS no meio de uma
-    // consulta (causa raiz do vídeo preto + cronômetro congelado).
+    // Dependemos do TOKEN/ID (primitivos), não dos objetos `session`/`user`.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.access_token, user?.id, sessionId, handleServerEvent, applyTerminalStatus]);
 
   /**
+   * Conecta LiveKit quando o participante já “entrou” (psicólogo direto, ou
+   * paciente após CTA do lobby). Não reconecta se a sala já existe.
+   */
+  useEffect(() => {
+    if (!hasJoined || loading || error || ended || cancelledInfo) return;
+    if (status === "CANCELLED" || status === "ENDED") return;
+    if (roomRef.current || livekitConnectingRef.current) return;
+
+    const creds = credentialsRef.current;
+    if (!creds) return;
+
+    let unmounted = false;
+    livekitConnectingRef.current = true;
+
+    (async () => {
+      try {
+        stopLobbyPreview();
+
+        const room = new Room();
+        roomRef.current = room;
+
+        room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack) => {
+          if (track.kind === Track.Kind.Video) {
+            remoteVideoTrackRef.current = track;
+            setRemoteVideoActive(true);
+            attachRemoteTrack();
+          } else if (track.kind === Track.Kind.Audio) {
+            track.attach();
+          }
+        });
+        room.on(RoomEvent.TrackUnsubscribed, (track: RemoteTrack) => {
+          if (track.kind === Track.Kind.Video && remoteVideoTrackRef.current === track) {
+            track.detach();
+            remoteVideoTrackRef.current = null;
+            setRemoteVideoActive(false);
+          }
+        });
+        room.on(RoomEvent.LocalTrackPublished, (publication) => {
+          if (publication.track?.kind === Track.Kind.Video) {
+            localVideoTrackRef.current = publication.track as LocalVideoTrack;
+            attachLocalTrack();
+          }
+        });
+        room.on(RoomEvent.LocalTrackUnpublished, (publication) => {
+          if (publication.track && localVideoTrackRef.current === publication.track) {
+            localVideoTrackRef.current = null;
+          }
+        });
+        room.on(RoomEvent.MediaDevicesError, () => {
+          setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_CONTINUES_MESSAGE });
+        });
+        room.on(RoomEvent.Reconnecting, () => setConnected(false));
+        room.on(RoomEvent.Reconnected, () => {
+          setConnected(true);
+          attachLocalTrack();
+          attachRemoteTrack();
+        });
+        room.on(RoomEvent.Disconnected, () => setConnected(false));
+
+        await room.connect(creds.livekitUrl, creds.livekitToken);
+        if (unmounted) {
+          await room.disconnect();
+          return;
+        }
+        setConnected(true);
+
+        if (!hasMediaDevicesSupport()) {
+          setMediaError({ type: "insecure-context", message: INSECURE_CONTEXT_MESSAGE });
+          setMicEnabled(false);
+          setCamEnabled(false);
+        } else {
+          try {
+            const enableMic = micEnabledRef.current;
+            const enableCam = camEnabledRef.current;
+            await room.localParticipant.setMicrophoneEnabled(enableMic);
+            await room.localParticipant.setCameraEnabled(enableCam);
+            setMicEnabled(enableMic);
+            setCamEnabled(enableCam);
+            const camPub = Array.from(room.localParticipant.videoTrackPublications.values())[0];
+            if (camPub?.videoTrack) {
+              localVideoTrackRef.current = camPub.videoTrack as LocalVideoTrack;
+              attachLocalTrack();
+            }
+          } catch {
+            setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_CONTINUES_MESSAGE });
+            setMicEnabled(false);
+            setCamEnabled(false);
+          }
+        }
+      } catch (err) {
+        if (!unmounted) {
+          setError(
+            err instanceof Error ? err.message : "Não foi possível conectar ao vídeo da consulta.",
+          );
+        }
+        roomRef.current = null;
+      } finally {
+        livekitConnectingRef.current = false;
+        if (!unmounted) setJoining(false);
+      }
+    })();
+
+    return () => {
+      unmounted = true;
+    };
+  }, [
+    hasJoined,
+    loading,
+    error,
+    ended,
+    cancelledInfo,
+    status,
+    attachLocalTrack,
+    attachRemoteTrack,
+    stopLobbyPreview,
+  ]);
+
+  /** Quando o stage monta após ACTIVE (saiu de PENDING), re-anexa tracks. */
+  useEffect(() => {
+    if (status !== "ACTIVE" && status !== "SUSPENDED") return;
+    if (!hasJoined) return;
+    attachLocalTrack();
+    attachRemoteTrack();
+  }, [status, hasJoined, attachLocalTrack, attachRemoteTrack]);
+
+  /**
    * Rede de segurança para o `unhandledrejection` característico de um
    * WebSocket (nosso ou interno do LiveKit) que rejeita com o `Event` DOM
-   * puro em vez de um `Error` — converte em log legível e evita que suba
-   * como crash no overlay do Next, sem mascarar erros reais (`Error`s
-   * continuam se propagando normalmente).
+   * puro em vez de um `Error`.
    */
   useEffect(() => {
     const handler = (event: PromiseRejectionEvent) => {
@@ -483,10 +577,8 @@ export function useSessionRoom(sessionId: string) {
   }, []);
 
   /**
-   * Backup do evento WS de recusa/cancelamento/encerramento: enquanto a
-   * sessão ainda está PENDING (sala de espera, antes do psicólogo aceitar),
-   * consulta o status a cada alguns segundos. Cobre o caso do push se perder
-   * — ex.: psicólogo recusa antes do WS do paciente terminar de conectar.
+   * Backup do evento WS: enquanto PENDING, consulta o status. Também atualiza
+   * ACTIVE/SUSPENDED (não só cancel/end) — cobre push perdido antes do WS abrir.
    */
   useEffect(() => {
     const token = session?.access_token;
@@ -495,16 +587,87 @@ export function useSessionRoom(sessionId: string) {
 
     const timer = setInterval(() => {
       fetchApi<SessionDetail>(`/sessions/${sessionId}`, { token })
-        .then((detail) => applyTerminalStatus(detail))
+        .then((detail) => {
+          if (applyTerminalStatus(detail)) return;
+          applyActiveStatus(detail);
+        })
         .catch(() => {
-          // Rede instável: o WS continua sendo o caminho principal, a próxima
-          // tentativa de polling tenta de novo.
+          // Rede instável: o WS continua sendo o caminho principal.
         });
     }, PENDING_STATUS_POLL_MS);
 
     return () => clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session?.access_token, sessionId, status, ended, cancelledInfo, applyTerminalStatus]);
+  }, [session?.access_token, sessionId, status, ended, cancelledInfo, applyTerminalStatus, applyActiveStatus]);
+
+  /**
+   * Preview leve de câmera no lobby (antes do LiveKit). Só enquanto
+   * requirePreJoin && !hasJoined && ACTIVE.
+   */
+  useEffect(() => {
+    if (!requirePreJoin || hasJoined) {
+      stopLobbyPreview();
+      return;
+    }
+    if (status !== "ACTIVE" && status !== "SUSPENDED") return;
+    if (!camEnabled) {
+      stopLobbyPreview();
+      return;
+    }
+    if (!hasMediaDevicesSupport()) {
+      setMediaError({ type: "insecure-context", message: INSECURE_CONTEXT_MESSAGE });
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user" },
+          audio: false,
+        });
+        if (cancelled) {
+          stream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        stopLobbyPreview();
+        lobbyStreamRef.current = stream;
+        const el = localVideoElRef.current;
+        if (el) {
+          el.srcObject = stream;
+          void el.play().catch(() => undefined);
+        }
+        setMediaError(null);
+      } catch {
+        setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_MESSAGE });
+        setCamEnabled(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [requirePreJoin, hasJoined, status, camEnabled, stopLobbyPreview]);
+
+  /** Lobby: anexa preview quando o <video> local monta. */
+  const lobbyLocalVideoRef = useCallback(
+    (el: HTMLVideoElement | null) => {
+      localVideoElRef.current = el;
+      if (el && lobbyStreamRef.current) {
+        el.srcObject = lobbyStreamRef.current;
+        void el.play().catch(() => undefined);
+      } else if (el) {
+        attachLocalTrack();
+      }
+    },
+    [attachLocalTrack],
+  );
+
+  const joinSession = useCallback(() => {
+    if (hasJoinedRef.current) return;
+    setJoining(true);
+    setHasJoined(true);
+  }, []);
 
   const endSession = useCallback(async () => {
     if (session?.access_token) {
@@ -514,10 +677,6 @@ export function useSessionRoom(sessionId: string) {
         // O servidor pode já ter encerrado a sessão; seguimos com o encerramento local.
       }
     }
-    // O POST acima já dispara o push WS oficial (session_ended/session_cancelled),
-    // que por si só chama `teardown` com os valores exatos do servidor. Dá uma
-    // janela curta para esse push chegar; se não chegar (rede instável), garante
-    // que a sala não fique "viva" mesmo assim.
     setTimeout(() => {
       if (!roomRef.current && !wsRef.current) return;
       teardown();
@@ -537,9 +696,11 @@ export function useSessionRoom(sessionId: string) {
     }
     setMicEnabled((prev) => {
       const next = !prev;
-      void roomRef.current?.localParticipant.setMicrophoneEnabled(next).catch(() => {
-        setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_MESSAGE });
-      });
+      if (roomRef.current) {
+        void roomRef.current.localParticipant.setMicrophoneEnabled(next).catch(() => {
+          setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_MESSAGE });
+        });
+      }
       return next;
     });
   }, []);
@@ -551,9 +712,11 @@ export function useSessionRoom(sessionId: string) {
     }
     setCamEnabled((prev) => {
       const next = !prev;
-      void roomRef.current?.localParticipant.setCameraEnabled(next).catch(() => {
-        setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_MESSAGE });
-      });
+      if (roomRef.current) {
+        void roomRef.current.localParticipant.setCameraEnabled(next).catch(() => {
+          setMediaError({ type: "permission-denied", message: PERMISSION_DENIED_MESSAGE });
+        });
+      }
       return next;
     });
   }, []);
@@ -571,8 +734,9 @@ export function useSessionRoom(sessionId: string) {
     const room = roomRef.current;
     if (!room) return;
     try {
-      const enableCam = cameraDefaultOnRef.current;
-      await room.localParticipant.setMicrophoneEnabled(true);
+      const enableMic = micEnabledRef.current;
+      const enableCam = camEnabledRef.current || cameraDefaultOnRef.current;
+      await room.localParticipant.setMicrophoneEnabled(enableMic || true);
       await room.localParticipant.setCameraEnabled(enableCam);
       const camPub = Array.from(room.localParticipant.videoTrackPublications.values())[0];
       if (camPub?.videoTrack) {
@@ -604,11 +768,15 @@ export function useSessionRoom(sessionId: string) {
     micEnabled,
     camEnabled,
     mediaError,
-    localVideoRef,
+    hasJoined,
+    joining,
+    remoteVideoActive,
+    localVideoRef: hasJoined ? localVideoRef : lobbyLocalVideoRef,
     remoteVideoRef,
     toggleMic,
     toggleCam,
     retryMedia,
+    joinSession,
     endSession,
   };
 }
