@@ -62,9 +62,10 @@ Copie de `.env.example`. No Coolify, defina no **Environment** do recurso (não 
 | `LIVEKIT_WEBHOOK_KEY` | Assinatura dos webhooks |
 | `ASAAS_BASE_URL` / `ASAAS_API_KEY` / `ASAAS_WEBHOOK_TOKEN` | Gateway — ver nota Asaas abaixo |
 | `COLUMN_ENCRYPTION_KEY` | `openssl rand -hex 32` |
-| `WEB_ORIGIN` | URL **pública** do front, ex. `https://app.seu-dominio` (CORS) |
+| `WEB_ORIGIN` | URL **pública** do front, ex. `https://app.seu-dominio` (CORS + CMS revalidate) |
+| `CMS_REVALIDATE_SECRET` | Opcional em dev; **obrigatório em produção** (mesmo valor no `web`) |
 
-Opcionais: `SUPABASE_PUBLISHABLE_KEY`, `SENTRY_DSN`, `BOOTSTRAP_ADMIN_EMAIL`, `LIVEKIT_WEBHOOK_KEY`.
+Opcionais: `SUPABASE_PUBLISHABLE_KEY`, `SENTRY_DSN`, `BOOTSTRAP_ADMIN_EMAIL`, `LIVEKIT_WEBHOOK_KEY`, `CMS_REVALIDATE_SECRET`.
 
 **Asaas (placeholders OK):** sem sandbox/produção ainda, use `ASAAS_API_KEY=FALTA_ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN=FALTA_ASAAS_WEBHOOK_TOKEN` (mesmo padrão do `.env` local). Pix fica indisponível; o restante da API sobe. Com chave `FALTA…`, sessões podem iniciar **sem** `recebedor_gateway_id` (bypass de onboarding financeiro, com warning nos logs). Troque por chaves reais depois e reinicie o serviço `api` (rebuild não é necessário).
 
@@ -94,6 +95,7 @@ Runtime (server-only no `web`):
 |----------|--------|
 | `SUPABASE_SERVICE_ROLE_KEY` | Leads/eventos do blog (se usar) |
 | `N8N_WEBHOOK_URL` | Opcional |
+| `CMS_REVALIDATE_SECRET` | Mesmo valor da API; protege `POST /api/cms/revalidate` |
 | `WEB_PORT` | Default `3000` |
 
 Alinhe:

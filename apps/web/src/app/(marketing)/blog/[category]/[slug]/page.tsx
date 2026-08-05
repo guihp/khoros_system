@@ -25,15 +25,21 @@ interface ArticlePageProps {
 }
 
 export async function generateStaticParams() {
-  return getAllArticles().map((a) => ({
-    category: a.category,
-    slug: a.slug,
-  }));
+  try {
+    const articles = await getAllArticles();
+    return articles.map((a) => ({
+      category: a.category,
+      slug: a.slug,
+    }));
+  } catch {
+    // Build before seed: allow on-demand rendering.
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { category, slug } = await params;
-  const article = getArticleBySlug(category, slug);
+  const article = await getArticleBySlug(category, slug);
   if (!article) return {};
 
   return {
@@ -55,23 +61,24 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { category, slug } = await params;
-  const article = getArticleBySlug(category, slug);
+  const article = await getArticleBySlug(category, slug);
   if (!article) notFound();
 
-  const categoryData = getCategoryBySlug(category);
-  const related = getRelatedArticles(article);
+  const categoryData = await getCategoryBySlug(category);
+  const related = await getRelatedArticles(article);
   const faqs = article.faq || [];
+  const categoryName = article.categoryName || categoryData?.name || category;
 
   return (
     <>
       <JsonLd
         data={[
-          articleSchema(article, categoryData?.name || category),
+          articleSchema(article, categoryName),
           breadcrumbSchema([
             { name: "Início", url: siteConfig.url },
             { name: "Blog", url: `${siteConfig.url}/blog` },
             {
-              name: categoryData?.name || category,
+              name: categoryName,
               url: `${siteConfig.url}/blog/categoria/${category}`,
             },
             {
@@ -94,7 +101,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           <Link href="/blog" className="hover:text-khoros-cyan-dark">Blog</Link>
           <span className="mx-2">/</span>
           <Link href={`/blog/categoria/${category}`} className="hover:text-khoros-cyan-dark">
-            {categoryData?.name}
+            {categoryName}
           </Link>
         </nav>
 

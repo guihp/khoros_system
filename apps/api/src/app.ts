@@ -6,7 +6,6 @@ import rateLimit from "@fastify/rate-limit";
 import websocket from "@fastify/websocket";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Redis } from "ioredis";
-import { AVATAR_MAX_BYTES } from "@khoros/shared";
 import type { Env } from "./config.js";
 
 /** Em dev, aceita localhost e IPs privados (teste no celular na mesma rede). */
@@ -27,6 +26,7 @@ import { registerAuthRoutes } from "./modules/auth/routes.js";
 import { registerConsentRoutes } from "./modules/consents/routes.js";
 import { registerScreeningRoutes } from "./modules/screening/routes.js";
 import { registerAdminRoutes } from "./modules/admin/routes.js";
+import { registerCmsRoutes } from "./modules/cms/routes.js";
 import { registerWalletRoutes } from "./modules/wallet/routes.js";
 import { registerAsaasWebhookRoutes } from "./modules/webhooks/asaas.js";
 import { registerLiveKitWebhookRoutes } from "./modules/webhooks/livekit.js";
@@ -96,7 +96,8 @@ export async function buildApp(env: Env): Promise<FastifyInstance> {
     methods: ["GET", "HEAD", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
   });
   await app.register(multipart, {
-    limits: { fileSize: AVATAR_MAX_BYTES, files: 1 },
+    // CMS accepts up to 5 MB; avatar routes still enforce AVATAR_MAX_BYTES.
+    limits: { fileSize: 5 * 1024 * 1024, files: 1 },
   });
   await app.register(rateLimit, { max: 120, timeWindow: "1 minute" });
   await app.register(websocket);
@@ -127,6 +128,7 @@ export async function buildApp(env: Env): Promise<FastifyInstance> {
   await registerConsentRoutes(app);
   await registerScreeningRoutes(app);
   await registerAdminRoutes(app);
+  await registerCmsRoutes(app);
   await registerWalletRoutes(app);
   await registerAsaasWebhookRoutes(app);
   await registerLiveKitWebhookRoutes(app);

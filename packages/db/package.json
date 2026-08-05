@@ -5,9 +5,22 @@
   "type": "module",
   "scripts": {
     "migrate": "node scripts/migrate.mjs",
-    "typecheck": "echo 'sql only'"
+    "seed:cms": "tsx scripts/seed-cms-from-mdx.ts --apply",
+    "seed:cms:dry": "tsx scripts/seed-cms-from-mdx.ts --dry-run",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@khoros/shared": "workspace:*",
+    "@supabase/supabase-js": "^2.112.1",
+    "gray-matter": "^4.0.3"
   },
   "devDependencies": {
-    "pg": "^8.16.0"
+    "@types/node": "^24.0.4",
+    "@types/pg": "^8.15.4",
+    "pg": "^8.16.0",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   }
 }

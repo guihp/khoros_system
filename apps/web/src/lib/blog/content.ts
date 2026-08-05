@@ -1,9 +1,12 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
 import readingTime from "reading-time";
-
-const articlesDirectory = path.join(process.cwd(), "content/articles");
+import {
+  CmsEmptyError,
+  CmsNotFoundError,
+  fetchCmsArticle,
+  fetchCmsArticles,
+  resolveCmsImage,
+  type CmsArticleRow,
+} from "@/lib/cms/client";
 
 export interface ArticleFAQ {
   question: string;
@@ -31,54 +34,78 @@ export interface ArticleFrontmatter {
 export interface Article extends ArticleFrontmatter {
   content: string;
   readingTime: string;
+  /** Nome da categoria (vindo do join CMS). */
+  categoryName?: string;
 }
 
-function parseArticle(filename: string): Article {
-  const filePath = path.join(articlesDirectory, filename);
-  const fileContents = fs.readFileSync(filePath, "utf8");
-  const { data, content } = matter(fileContents);
-  const stats = readingTime(content);
+function mapArticle(row: CmsArticleRow): Article {
+  const image = resolveCmsImage(row.legacy_image_path, row.hero_media);
+  const stats = readingTime(row.body_mdx);
+  const publishedAt = row.published_at ?? row.updated_at;
 
   return {
-    ...(data as ArticleFrontmatter),
-    content,
+    title: row.title,
+    description: row.description,
+    category: row.category.slug,
+    categoryName: row.category.name,
+    slug: row.slug,
+    publishedAt,
+    updatedAt: row.updated_at,
+    author: row.author,
+    reviewer: row.reviewer ?? undefined,
+    reviewerCrp: row.reviewer_crp ?? undefined,
+    image: image.src,
+    imageAlt: row.image_alt ?? image.alt,
+    sensitive: row.sensitive,
+    sources: row.sources ?? [],
+    faq: row.faq ?? [],
+    relatedSlugs: row.related_slugs ?? [],
+    content: row.body_mdx,
     readingTime: stats.text,
   };
 }
 
-export function getAllArticles(): Article[] {
-  if (!fs.existsSync(articlesDirectory)) return [];
-
-  const files = fs.readdirSync(articlesDirectory).filter((f) => f.endsWith(".mdx"));
-
-  return files
-    .map(parseArticle)
-    .sort(
-      (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
-    );
+export async function getAllArticles(): Promise<Article[]> {
+  const rows = await fetchCmsArticles();
+  return rows.map(mapArticle);
 }
 
-export function getArticleBySlug(
+export async function getArticleBySlug(
   category: string,
-  slug: string
-): Article | undefined {
-  return getAllArticles().find(
-    (a) => a.category === category && a.slug === slug
-  );
+  slug: string,
+): Promise<Article | undefined> {
+  try {
+    const row = await fetchCmsArticle(category, slug);
+    return mapArticle(row);
+  } catch (err) {
+    if (err instanceof CmsNotFoundError) return undefined;
+    throw err;
+  }
 }
 
-export function getArticlesByCategory(category: string): Article[] {
-  return getAllArticles().filter((a) => a.category === category);
+export async function getArticlesByCategory(category: string): Promise<Article[]> {
+  try {
+    const rows = await fetchCmsArticles(category);
+    return rows.map(mapArticle);
+  } catch (err) {
+    if (err instanceof CmsEmptyError) return [];
+    throw err;
+  }
 }
 
-export function getRelatedArticles(article: Article, limit = 3): Article[] {
-  const all = getAllArticles().filter(
-    (a) => !(a.category === article.category && a.slug === article.slug)
+export async function getRelatedArticles(article: Article, limit = 3): Promise<Article[]> {
+  const all = (await getAllArticles()).filter(
+    (a) => !(a.category === article.category && a.slug === article.slug),
   );
 
-  const related = article.relatedSlugs
-    ? all.filter((a) => article.relatedSlugs?.includes(`${a.category}/${a.slug}`))
+  const related = article.relatedSlugs?.length
+    ? all.filter((a) => {
+        const key = `${a.category}/${a.slug}`;
+        return (
+          article.relatedSlugs?.includes(key) ||
+          article.relatedSlugs?.includes(a.slug)
+        );
+      })
     : all.filter((a) => a.category === article.category);
 
   return related.slice(0, limit);

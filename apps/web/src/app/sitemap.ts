@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 import { getAllArticles } from "@/lib/blog/content";
-import { categories } from "@/lib/blog/categories";
+import { getAllCategories } from "@/lib/blog/categories";
 import { siteConfig } from "@/lib/blog/site";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url;
 
   const staticPages = [
@@ -22,19 +22,29 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === "" ? 1 : 0.8,
   }));
 
-  const categoryPages = categories.map((cat) => ({
-    url: `${base}/blog/categoria/${cat.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "weekly" as const,
-    priority: 0.7,
-  }));
+  let categoryPages: MetadataRoute.Sitemap = [];
+  let articlePages: MetadataRoute.Sitemap = [];
 
-  const articlePages = getAllArticles().map((article) => ({
-    url: `${base}/blog/${article.category}/${article.slug}`,
-    lastModified: new Date(article.updatedAt || article.publishedAt),
-    changeFrequency: "monthly" as const,
-    priority: 0.9,
-  }));
+  try {
+    const [categories, articles] = await Promise.all([
+      getAllCategories(),
+      getAllArticles(),
+    ]);
+    categoryPages = categories.map((cat) => ({
+      url: `${base}/blog/categoria/${cat.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    }));
+    articlePages = articles.map((article) => ({
+      url: `${base}/blog/${article.category}/${article.slug}`,
+      lastModified: new Date(article.updatedAt || article.publishedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.9,
+    }));
+  } catch {
+    // CMS ainda vazio / API offline — sitemap só com páginas estáticas.
+  }
 
   return [...staticPages, ...categoryPages, ...articlePages];
 }

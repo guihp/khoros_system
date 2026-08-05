@@ -130,9 +130,16 @@ export async function uploadApiFile<T = unknown>(
   file: File,
   token: string,
   fieldName = "file",
+  /** Campos extras do multipart (ex.: altText / status no CMS). */
+  fields?: Record<string, string>,
 ): Promise<T> {
   const form = new FormData();
   form.append(fieldName, file);
+  if (fields) {
+    for (const [key, value] of Object.entries(fields)) {
+      form.append(key, value);
+    }
+  }
 
   let res: Response;
   try {

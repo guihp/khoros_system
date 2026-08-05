@@ -298,31 +298,33 @@ export function SessionRoom({
   }
 
   return (
-    <main className="flex min-h-dvh flex-col bg-[#0f1419]">
-      <SessionMediaStage
-        connected={room.connected}
-        suspended={room.status === "SUSPENDED"}
-        wsConnected={room.wsConnected}
-        remoteVideoRef={room.remoteVideoRef}
-        localVideoRef={room.localVideoRef}
-        camEnabled={room.camEnabled}
-        remoteVideoActive={room.remoteVideoActive}
-        remoteLabel={resolvedRemoteLabel}
-        localLabel="Você"
-        mediaError={room.mediaError}
-        onRetryMedia={() => void room.retryMedia()}
-        paidSeconds={room.paidSeconds}
-        accruedCents={room.accruedCents}
-        warning={room.warning}
-      />
+    <main className="h-dvh overflow-hidden bg-[#0f1419]">
+      <div className="mx-auto flex h-full w-full max-w-screen-2xl flex-col">
+        <SessionMediaStage
+          connected={room.connected}
+          suspended={room.status === "SUSPENDED"}
+          wsConnected={room.wsConnected}
+          remoteVideoRef={room.remoteVideoRef}
+          localVideoRef={room.localVideoRef}
+          camEnabled={room.camEnabled}
+          remoteVideoActive={room.remoteVideoActive}
+          remoteLabel={resolvedRemoteLabel}
+          localLabel="Você"
+          mediaError={room.mediaError}
+          onRetryMedia={() => void room.retryMedia()}
+          paidSeconds={room.paidSeconds}
+          accruedCents={room.accruedCents}
+          warning={room.warning}
+        />
 
-      <SessionRoomControls
-        micEnabled={room.micEnabled}
-        camEnabled={room.camEnabled}
-        onToggleMic={room.toggleMic}
-        onToggleCam={room.toggleCam}
-        onEndSession={() => void room.endSession()}
-      />
+        <SessionRoomControls
+          micEnabled={room.micEnabled}
+          camEnabled={room.camEnabled}
+          onToggleMic={room.toggleMic}
+          onToggleCam={room.toggleCam}
+          onEndSession={() => void room.endSession()}
+        />
+      </div>
     </main>
   );
 }

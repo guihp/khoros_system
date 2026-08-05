@@ -146,9 +146,9 @@ export function SessionMediaStage({
         </span>
       </div>
 
-      {/* Área do tile — preenche o espaço útil acima do dock */}
+      {/* Área do tile — usa o espaço útil sem crescer indefinidamente em telas grandes */}
       <div className="flex min-h-0 flex-1 items-center justify-center px-3 pb-2 pt-14 sm:px-6 sm:pb-3 sm:pt-16">
-        <div className="relative h-full max-h-[min(100%,40rem)] w-full max-w-[1100px] overflow-hidden rounded-2xl bg-[#1a222c] shadow-2xl shadow-black/40 aspect-[9/16] sm:aspect-video sm:h-auto sm:max-h-none">
+        <div className="relative aspect-[9/16] w-full max-w-[min(100%,calc((100dvh-8rem)*9/16))] overflow-hidden rounded-2xl bg-[#1a222c] shadow-2xl shadow-black/40 sm:aspect-video sm:max-w-[min(80rem,calc((100dvh-8.5rem)*16/9))]">
           {/* Tile principal: remoto se presente, senão local */}
           {localIsMain ? (
             <>

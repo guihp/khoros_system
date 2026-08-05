@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { getCategoryBySlug, categories } from "@/lib/blog/categories";
+import { getCategoryBySlug, getAllCategories } from "@/lib/blog/categories";
 import { getArticlesByCategory } from "@/lib/blog/content";
 import { ArticleCard } from "@/components/marketing/ArticleCard";
 import { CategoryImage } from "@/components/marketing/CategoryImage";
@@ -16,12 +16,17 @@ interface CategoryPageProps {
 }
 
 export async function generateStaticParams() {
-  return categories.map((c) => ({ slug: c.slug }));
+  try {
+    const categories = await getAllCategories();
+    return categories.map((c) => ({ slug: c.slug }));
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) return {};
 
   return {
@@ -32,10 +37,10 @@ export async function generateMetadata({ params }: CategoryPageProps): Promise<M
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
-  const category = getCategoryBySlug(slug);
+  const category = await getCategoryBySlug(slug);
   if (!category) notFound();
 
-  const articles = getArticlesByCategory(slug);
+  const articles = await getArticlesByCategory(slug);
   const faqs = getFaqByCategory(slug);
 
   return (

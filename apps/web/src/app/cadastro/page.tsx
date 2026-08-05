@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { createClient } from "@/lib/supabase/client";
 import { fetchApi, ApiError } from "@/lib/api";
@@ -12,13 +12,19 @@ import { postRegisterRedirectPath, roleHomePath } from "@/lib/complete-registrat
 // ADMIN é cadastro via BOOTSTRAP_ADMIN_EMAIL (ver auth/routes.ts) — sem UI própria aqui.
 type Role = "PATIENT" | "PSYCHOLOGIST";
 
-export default function CadastroPage() {
+function parseRoleParam(value: string | null): Role {
+  if (value === "PSYCHOLOGIST" || value === "PATIENT") return value;
+  return "PATIENT";
+}
+
+function CadastroForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { session, user, me, loading: authLoading, refresh } = useAuth();
   // Auth já existe (ex.: confirmou e-mail e entrou), mas ainda falta o perfil de domínio.
   const alreadyLoggedIn = Boolean(session) && me?.registered === false;
 
-  const [role, setRole] = useState<Role>("PATIENT");
+  const [role, setRole] = useState<Role>(() => parseRoleParam(searchParams.get("role")));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -31,6 +37,11 @@ export default function CadastroPage() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Query ?role=PATIENT|PSYCHOLOGIST pré-seleciona a aba (links do marketing).
+  useEffect(() => {
+    setRole(parseRoleParam(searchParams.get("role")));
+  }, [searchParams]);
 
   // Se já tem perfil completo, não faz sentido estar aqui — manda para a home do papel.
   useEffect(() => {
@@ -310,5 +321,17 @@ export default function CadastroPage() {
         </p>
       )}
     </main>
+  );
+}
+
+export default function CadastroPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="mx-auto max-w-sm px-4 py-16 text-calm-600">Carregando…</main>
+      }
+    >
+      <CadastroForm />
+    </Suspense>
   );
 }

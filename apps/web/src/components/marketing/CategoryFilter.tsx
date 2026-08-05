@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { categories } from "@/lib/blog/categories";
 
-export function CategoryFilter() {
+interface CategoryFilterProps {
+  categories: Array<{ slug: string; name: string }>;
+}
+
+export function CategoryFilter({ categories }: CategoryFilterProps) {
   const searchParams = useSearchParams();
   const active = searchParams.get("categoria");
 

@@ -32,16 +32,22 @@ export function Header() {
             </Link>
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Link
-              href="/cadastro"
-              className="hidden sm:inline-flex text-sm font-medium text-khoros-cyan-dark px-3 py-2 hover:underline"
+              href="/cadastro?role=PATIENT"
+              className="text-xs sm:text-sm font-medium text-khoros-cyan-dark px-2 sm:px-3 py-2 hover:underline"
             >
-              Criar conta
+              Sou paciente
+            </Link>
+            <Link
+              href="/cadastro?role=PSYCHOLOGIST"
+              className="text-xs sm:text-sm font-medium text-khoros-cyan-dark px-2 sm:px-3 py-2 hover:underline"
+            >
+              Sou psicólogo
             </Link>
             <Link
               href="/entrar"
-              className="text-sm font-medium bg-khoros-cyan text-white px-4 py-2 rounded-full hover:bg-khoros-cyan-dark transition-colors"
+              className="text-sm font-medium bg-khoros-cyan text-white px-3 sm:px-4 py-2 rounded-full hover:bg-khoros-cyan-dark transition-colors"
             >
               Entrar
             </Link>

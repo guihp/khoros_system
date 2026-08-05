@@ -62,6 +62,13 @@ const envSchema = z.object({
   WEB_ORIGIN: z.string().url().default("http://localhost:3000"),
 
   /**
+   * Shared secret for POST {WEB_ORIGIN}/api/cms/revalidate after publish.
+   * Optional in local/dev (Next allows missing secret outside production).
+   * Set the same value on the web service in production.
+   */
+  CMS_REVALIDATE_SECRET: z.preprocess(emptyToUndefined, z.string().min(8).optional()),
+
+  /**
    * Caminhos opcionais para cert/key HTTPS locais (gerados por
    * scripts/gen-certs.sh). Só usados em dev, para testar no celular: uma
    * página HTTPS não pode chamar uma API HTTP (mixed content) e
