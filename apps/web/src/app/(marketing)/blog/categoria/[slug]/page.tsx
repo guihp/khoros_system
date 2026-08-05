@@ -15,11 +15,16 @@ interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// ISR sob demanda — ver comentário em blog/[category]/[slug]/page.tsx.
+export const dynamicParams = true;
+export const revalidate = 300;
+
 export async function generateStaticParams() {
   try {
     const categories = await getAllCategories();
     return categories.map((c) => ({ slug: c.slug }));
   } catch {
+    // API fora do ar / CMS sem seed: renderiza on-demand.
     return [];
   }
 }

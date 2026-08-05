@@ -10,6 +10,11 @@ export const metadata: Metadata = {
     "Respostas acolhedoras sobre terapia, ansiedade, burnout, relacionamentos e saúde emocional.",
 };
 
+// Conteúdo vem do CMS: renderiza a cada request (a API não existe no docker
+// build). `fetchCache` mantém o Data Cache + revalidateTag funcionando.
+export const dynamic = "force-dynamic";
+export const fetchCache = "default-cache";
+
 export default async function FAQPage() {
   const page = await fetchCmsPage("faq");
   const faqItems = page.sections

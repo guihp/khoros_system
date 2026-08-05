@@ -24,6 +24,12 @@ interface ArticlePageProps {
   params: Promise<{ category: string; slug: string }>;
 }
 
+// ISR sob demanda: nada é pré-renderizado se a API não estiver acessível no
+// build (caso do docker build). A página é gerada e cacheada no primeiro
+// request e invalidada por /api/cms/revalidate (tags) ou pelo TTL abaixo.
+export const dynamicParams = true;
+export const revalidate = 300;
+
 export async function generateStaticParams() {
   try {
     const articles = await getAllArticles();
@@ -32,7 +38,7 @@ export async function generateStaticParams() {
       slug: a.slug,
     }));
   } catch {
-    // Build before seed: allow on-demand rendering.
+    // API fora do ar / CMS sem seed: renderiza on-demand.
     return [];
   }
 }

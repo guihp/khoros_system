@@ -3,6 +3,11 @@ import { getAllArticles } from "@/lib/blog/content";
 import { getAllCategories } from "@/lib/blog/categories";
 import { siteConfig } from "@/lib/blog/site";
 
+// Gerado a cada request: no docker build a API não existe e o sitemap ficaria
+// congelado só com as páginas estáticas. O fetch do CMS continua cacheado.
+export const dynamic = "force-dynamic";
+export const fetchCache = "default-cache";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteConfig.url;
 

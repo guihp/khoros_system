@@ -14,7 +14,9 @@ COPY apps/web/package.json ./apps/web/
 COPY apps/api/package.json ./apps/api/
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/db/package.json ./packages/db/
-RUN pnpm install --frozen-lockfile
+# --prod=false: o build precisa de devDependencies (typescript, next). Imune a um
+# NODE_ENV=production injetado no build pelo Coolify.
+RUN pnpm install --frozen-lockfile --prod=false
 
 # ── build ────────────────────────────────────────────────────────────────────
 FROM deps AS build
@@ -54,7 +56,7 @@ WORKDIR /app
 COPY --from=build --chown=node:node /app/apps/web/.next/standalone ./
 COPY --from=build --chown=node:node /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=build --chown=node:node /app/apps/web/public ./apps/web/public
-# Blog MDX lido em runtime via process.cwd()/content/articles
+# MDX do repo — fonte de verdade é o CMS; mantido só para o seed/paridade.
 COPY --from=build --chown=node:node /app/apps/web/content ./apps/web/content
 
 USER node

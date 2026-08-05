@@ -8,6 +8,11 @@ export const metadata: Metadata = {
     "Conheça a equipe por trás do blog KHOROS, nossa abordagem editorial e compromisso com conteúdo de saúde mental baseado em evidências.",
 };
 
+// Conteúdo vem do CMS: renderiza a cada request (a API não existe no docker
+// build). `fetchCache` mantém o Data Cache + revalidateTag funcionando.
+export const dynamic = "force-dynamic";
+export const fetchCache = "default-cache";
+
 export default async function SobrePage() {
   const page = await fetchCmsPage("sobre");
   return <SectionRenderer sections={page.sections} pageSlug="sobre" />;

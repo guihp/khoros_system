@@ -1,7 +1,20 @@
 import { cmsSectionSchema, type CmsSection } from "@khoros/shared";
 import { CMS_TAGS } from "./tags";
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001").replace(/\/$/, "");
+/**
+ * Base URL do CMS. `CMS_API_URL` (server-only) permite apontar para a rede
+ * interna do compose (ex.: http://api:3001) — as páginas de marketing renderizam
+ * no servidor a cada request e o domínio público pode não ser resolvível de
+ * dentro do container.
+ */
+const API_URL = (
+  process.env.CMS_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  "http://localhost:3001"
+).replace(/\/$/, "");
+
+/** TTL do Data Cache. Publicações usam /api/cms/revalidate (revalidateTag). */
+const CMS_CACHE_SECONDS = 300;
 
 export class CmsEmptyError extends Error {
   constructor(message: string) {
@@ -90,7 +103,7 @@ async function cmsFetch<T>(path: string, tags: string[]): Promise<T> {
   try {
     res = await fetch(`${API_URL}${path}`, {
       headers: { Accept: "application/json" },
-      next: { tags },
+      next: { tags, revalidate: CMS_CACHE_SECONDS },
     });
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);

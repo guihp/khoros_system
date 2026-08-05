@@ -96,12 +96,20 @@ Runtime (server-only no `web`):
 | `SUPABASE_SERVICE_ROLE_KEY` | Leads/eventos do blog (se usar) |
 | `N8N_WEBHOOK_URL` | Opcional |
 | `CMS_REVALIDATE_SECRET` | Mesmo valor da API; protege `POST /api/cms/revalidate` |
+| `CMS_API_URL` | Base do CMS no SSR. Default do compose: `http://api:3001` (rede interna) |
 | `WEB_PORT` | Default `3000` |
 
 Alinhe:
 
 - `WEB_ORIGIN` (API) = `NEXT_PUBLIC_SITE_URL` (web)
 - `NEXT_PUBLIC_API_URL` = domínio público da API
+
+As páginas de marketing/blog buscam o CMS **em runtime** (nada de fetch no
+`docker build`, onde a API não existe). Por isso a imagem do `web` builda com a
+API fora do ar, mas o container precisa alcançar a API — mantenha `CMS_API_URL`
+na rede interna. **Não** marque nada que injete `NODE_ENV=production` no build:
+os Dockerfiles já usam `pnpm install --prod=false`, mas o build args não
+consumido só gera warning.
 
 ## 5. Webhooks (URLs públicas da API)
 

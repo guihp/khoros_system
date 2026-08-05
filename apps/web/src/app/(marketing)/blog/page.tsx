@@ -11,6 +11,11 @@ export const metadata: Metadata = {
     "Artigos sobre ansiedade, burnout, terapia, autoestima e mais. Conteúdo acolhedor e baseado em evidências.",
 };
 
+// Índice do blog vem do CMS: renderiza a cada request (a API não existe no
+// docker build). `fetchCache` mantém o Data Cache + revalidateTag funcionando.
+export const dynamic = "force-dynamic";
+export const fetchCache = "default-cache";
+
 interface BlogPageProps {
   searchParams: Promise<{ categoria?: string }>;
 }

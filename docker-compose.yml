@@ -87,6 +87,10 @@ services:
       PORT: ${WEB_PORT:-3000}
       # Runtime (server components / route handlers) — não prefixo NEXT_PUBLIC_
       # NEXT_PUBLIC_* já vêm inlined no build (build args); não precisam de runtime.
+      # As páginas de marketing buscam o CMS server-side a cada request: usa a
+      # rede interna do compose em vez de sair pelo domínio público.
+      # (se API_PORT for customizado, defina CMS_API_URL junto)
+      CMS_API_URL: ${CMS_API_URL:-http://api:3001}
       CMS_REVALIDATE_SECRET: ${CMS_REVALIDATE_SECRET:-}
       # Media proxy (/api/cms/media/[id]) — createSupabaseAdmin lê URL + secret em runtime
       SUPABASE_URL: ${SUPABASE_URL:-}
