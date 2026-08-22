@@ -14,7 +14,7 @@ type SectionWithMeta = CmsSection & { id: string; position: number };
 
 interface SectionRendererProps {
   sections: SectionWithMeta[];
-  /** When set to "home", ensures dual signup CTAs (paciente + psicólogo). */
+  /** Used for home-only fallbacks (e.g. disclaimer). */
   pageSlug?: string;
 }
 
@@ -30,51 +30,8 @@ function buttonClass(variant: CtaButton["variant"] = "primary"): string {
   return "inline-flex justify-center px-8 py-3 bg-khoros-cyan text-white font-medium rounded-full hover:bg-khoros-cyan-dark transition-colors";
 }
 
-/** Expand bare /cadastro into dual role CTAs; inject them on home if missing. */
-function resolveCtaButtons(
-  buttons: CtaButton[],
-  opts: { ensureDualSignup?: boolean },
-): CtaButton[] {
-  const expanded: CtaButton[] = [];
-  for (const btn of buttons) {
-    const isBareCadastro =
-      btn.href === "/cadastro" ||
-      (btn.href.startsWith("/cadastro?") && !/[?&]role=/.test(btn.href));
-    if (isBareCadastro) {
-      expanded.push({
-        label: "Sou paciente",
-        href: "/cadastro?role=PATIENT",
-        variant: "primary",
-      });
-      expanded.push({
-        label: "Sou psicólogo",
-        href: "/cadastro?role=PSYCHOLOGIST",
-        variant: "secondary",
-      });
-      continue;
-    }
-    expanded.push(btn);
-  }
-
-  const hasPatient = expanded.some((b) => b.href.includes("role=PATIENT"));
-  const hasPsych = expanded.some((b) => b.href.includes("role=PSYCHOLOGIST"));
-  if (opts.ensureDualSignup && !(hasPatient && hasPsych)) {
-    return [
-      {
-        label: "Sou paciente",
-        href: "/cadastro?role=PATIENT",
-        variant: "primary",
-      },
-      {
-        label: "Sou psicólogo",
-        href: "/cadastro?role=PSYCHOLOGIST",
-        variant: "secondary",
-      },
-      ...expanded.filter((b) => !b.href.startsWith("/cadastro")),
-    ];
-  }
-  return expanded;
-}
+// Onda 0: CTAs de cadastro (Sou paciente / Sou psicólogo) removidos do marketing.
+// Para relançar: restaurar links em Header.tsx + reativar expansão de /cadastro aqui.
 
 function HeroSection({ config }: { config: CmsSectionConfig<"hero"> }) {
   const ctas = config.ctas ?? [];
@@ -109,8 +66,10 @@ function HeroSection({ config }: { config: CmsSectionConfig<"hero"> }) {
 }
 
 async function CategoryGridSection({ config }: { config: CmsSectionConfig<"category_grid"> }) {
-  const categories = await getAllCategories();
-  const featured = categories.slice(0, config.limit ?? 6);
+  const [categories, articles] = await Promise.all([getAllCategories(), getAllArticles()]);
+  const publishedSlugs = new Set(articles.map((a) => a.category));
+  const visibleCategories = categories.filter((c) => publishedSlugs.has(c.slug));
+  const featured = visibleCategories.slice(0, config.limit ?? 6);
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
       <h2 className="text-2xl font-semibold mb-2">{config.title ?? "Temas em destaque"}</h2>
@@ -173,14 +132,8 @@ function RichTextSection({ config }: { config: CmsSectionConfig<"rich_text"> }) 
   );
 }
 
-function CtaBandSection({
-  config,
-  ensureDualSignup,
-}: {
-  config: CmsSectionConfig<"cta_band">;
-  ensureDualSignup?: boolean;
-}) {
-  const buttons = resolveCtaButtons(config.buttons, { ensureDualSignup });
+function CtaBandSection({ config }: { config: CmsSectionConfig<"cta_band"> }) {
+  const buttons = config.buttons;
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 text-center">
       <div className="bg-khoros-warm border border-border rounded-3xl p-8 sm:p-12">
@@ -283,10 +236,7 @@ function DisclaimerSection({ config }: { config: CmsSectionConfig<"disclaimer"> 
   );
 }
 
-async function renderSection(
-  section: SectionWithMeta,
-  opts: { ensureDualSignup?: boolean },
-) {
+async function renderSection(section: SectionWithMeta) {
   switch (section.type) {
     case "hero":
       return <HeroSection key={section.id} config={section.config} />;
@@ -297,13 +247,7 @@ async function renderSection(
     case "rich_text":
       return <RichTextSection key={section.id} config={section.config} />;
     case "cta_band":
-      return (
-        <CtaBandSection
-          key={section.id}
-          config={section.config}
-          ensureDualSignup={opts.ensureDualSignup}
-        />
-      );
+      return <CtaBandSection key={section.id} config={section.config} />;
     case "faq":
       return <FaqSection key={section.id} config={section.config} />;
     case "steps":
@@ -320,30 +264,12 @@ async function renderSection(
 }
 
 export async function SectionRenderer({ sections, pageSlug }: SectionRendererProps) {
-  const ensureDualSignup = pageSlug === "home";
-  const hasCtaBand = sections.some((s) => s.type === "cta_band");
-
-  const rendered = await Promise.all(
-    sections.map((section) => renderSection(section, { ensureDualSignup })),
-  );
+  const rendered = await Promise.all(sections.map((section) => renderSection(section)));
 
   return (
     <>
       {rendered}
-      {ensureDualSignup && !hasCtaBand && (
-        <CtaBandSection
-          ensureDualSignup
-          config={{
-            title: "Converse com um especialista na hora",
-            text: "Psicólogos com CRP verificado, por vídeo, pagando só os minutos que usar — sem hora marcada. Crie sua conta como paciente ou como profissional.",
-            buttons: [
-              { label: "Sou paciente", href: "/cadastro?role=PATIENT", variant: "primary" },
-              { label: "Sou psicólogo", href: "/cadastro?role=PSYCHOLOGIST", variant: "secondary" },
-            ],
-          }}
-        />
-      )}
-      {ensureDualSignup && !sections.some((s) => s.type === "disclaimer") && (
+      {pageSlug === "home" && !sections.some((s) => s.type === "disclaimer") && (
         <DisclaimerSection config={{ text: siteConfig.goldenRule }} />
       )}
     </>

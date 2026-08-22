@@ -215,6 +215,25 @@ export interface PendingCrpResponse {
   items: PendingCrpEntry[];
 }
 
+export interface LeadEntry {
+  id: string;
+  name: string;
+  email: string;
+  city: string;
+  article_slug: string | null;
+  article_category: string | null;
+  article_title: string | null;
+  source: string;
+  created_at: string;
+}
+
+export interface AdminLeadsResponse {
+  items: LeadEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export interface CrpActionResponse {
   user_id: string;
   crp_status: CrpStatus;

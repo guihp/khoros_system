@@ -22,7 +22,16 @@ export async function POST(request: Request) {
 
     const supabase = createSupabaseAdmin();
 
-    if (supabase) {
+    if (!supabase) {
+      if (process.env.NODE_ENV === "production") {
+        console.error("[leads] Supabase credentials missing in production");
+        return NextResponse.json(
+          { error: "Serviço temporariamente indisponível." },
+          { status: 503 },
+        );
+      }
+      console.log("[lead captured - no supabase]", data);
+    } else {
       const { error } = await supabase.from("leads").insert({
         name: data.name,
         email: data.email.toLowerCase(),
@@ -42,8 +51,6 @@ export async function POST(request: Request) {
           { status: 500 }
         );
       }
-    } else {
-      console.log("[lead captured - no supabase]", data);
     }
 
     const webhookUrl = process.env.N8N_WEBHOOK_URL;

@@ -14,6 +14,11 @@ const SECTIONS = [
     title: "Conteúdo",
     description: "Artigos, categorias, mídia e páginas do marketing / blog.",
   },
+  {
+    href: "/admin/leads",
+    title: "Lista de espera / Leads",
+    description: "Contatos capturados pela waitlist e formulários de artigos.",
+  },
 ] as const;
 
 function AdminHub() {

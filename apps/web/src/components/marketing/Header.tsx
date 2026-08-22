@@ -34,16 +34,10 @@ export function Header() {
 
           <div className="flex items-center gap-1.5 sm:gap-2">
             <Link
-              href="/cadastro?role=PATIENT"
+              href="/como-funciona#lista-espera"
               className="text-xs sm:text-sm font-medium text-khoros-cyan-dark px-2 sm:px-3 py-2 hover:underline"
             >
-              Sou paciente
-            </Link>
-            <Link
-              href="/cadastro?role=PSYCHOLOGIST"
-              className="text-xs sm:text-sm font-medium text-khoros-cyan-dark px-2 sm:px-3 py-2 hover:underline"
-            >
-              Sou psicólogo
+              Lista de espera
             </Link>
             <Link
               href="/entrar"

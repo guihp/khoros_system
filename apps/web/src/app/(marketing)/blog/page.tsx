@@ -26,6 +26,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     getAllArticles(),
     getAllCategories(),
   ]);
+  const publishedSlugs = new Set(allArticles.map((a) => a.category));
+  const visibleCategories = categories.filter((c) => publishedSlugs.has(c.slug));
   const articles = categoria
     ? allArticles.filter((a) => a.category === categoria)
     : allArticles;
@@ -41,7 +43,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       </header>
 
       <Suspense fallback={<div className="h-10" />}>
-        <CategoryFilter categories={categories} />
+        <CategoryFilter categories={visibleCategories} />
       </Suspense>
 
       {articles.length === 0 ? (

@@ -73,4 +73,30 @@ export async function registerAdminRoutes(app: FastifyInstance): Promise<void> {
 
     return reply.send(data);
   });
+
+  app.get("/admin/leads", { preHandler: app.requireRole("ADMIN") }, async (req, reply) => {
+    const query = req.query as { source?: string; limit?: string; offset?: string };
+    const limit = Math.min(Number(query.limit ?? 50) || 50, 200);
+    const offset = Number(query.offset ?? 0) || 0;
+
+    let dbQuery = app.supabase
+      .from("leads")
+      .select(
+        "id, name, email, city, article_slug, article_category, article_title, source, created_at",
+        { count: "exact" },
+      )
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (query.source === "waitlist" || query.source === "article") {
+      dbQuery = dbQuery.eq("source", query.source);
+    }
+
+    const { data, error, count } = await dbQuery;
+    if (error) {
+      return reply.code(500).send({ error: "QUERY_FAILED", message: error.message });
+    }
+
+    return reply.send({ items: data ?? [], total: count ?? 0, limit, offset });
+  });
 }

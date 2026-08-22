@@ -171,3 +171,11 @@ docker build -f apps/web/Dockerfile \
 - Redis é shared state (locks, presença, bilhetagem). Não rode várias réplicas da API **sem** Redis estável.
 - Não grave sessões de vídeo; LiveKit Cloud cuida da mídia.
 - Rebuild `web` sempre que alterar `NEXT_PUBLIC_*`.
+
+## 9. Onda 0 — CTAs de cadastro no marketing
+
+Durante a validação (Onda 0), os CTAs **Sou paciente / Sou psicólogo** foram removidos do site público (Header + expansão automática de `/cadastro` no `SectionRenderer`). O header usa **Lista de espera** → `/como-funciona#lista-espera`.
+
+**Para relançar a plataforma transacional:** restaurar os links em `apps/web/src/components/marketing/Header.tsx` e reativar a expansão de `/cadastro` em `apps/web/src/components/cms/SectionRenderer.tsx` (ver comentário no arquivo). Atualizar também a seção `cta_band` da home no **admin CMS** (produção) — o seed em `packages/db/scripts/lib/marketing-pages.ts` só afeta re-seed, não o banco live.
+
+**Migration de leads:** aplicar `0007_leads.sql` no Supabase de produção para o formulário de waitlist e captura via artigos (`POST /api/leads`).

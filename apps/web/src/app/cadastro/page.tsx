@@ -44,8 +44,11 @@ function CadastroForm() {
   }, [searchParams]);
 
   // Se já tem perfil completo, não faz sentido estar aqui — manda para a home do papel.
+  // ADMIN pode permanecer aqui ao testar links do marketing.
   useEffect(() => {
-    if (me?.registered) router.replace(roleHomePath(me.role));
+    if (me?.registered && me.role !== "ADMIN") {
+      router.replace(roleHomePath(me.role));
+    }
   }, [me, router]);
 
   useEffect(() => {

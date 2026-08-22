@@ -71,11 +71,11 @@ function homePage(): SeedPage {
       section(
         "cta_band",
         {
-          title: "Converse com um especialista na hora",
-          text: "Psicólogos com CRP verificado, por vídeo, pagando só os minutos que usar — sem hora marcada. Entre na plataforma ou crie sua conta.",
+          title: "Quer ser avisado(a) quando a plataforma abrir?",
+          text: "Estamos validando a demanda com conteúdo de qualidade. Deixe seu e-mail na lista de espera ou continue explorando o blog enquanto preparamos o lançamento.",
           buttons: [
-            { label: "Entrar", href: "/entrar", variant: "primary" },
-            { label: "Criar conta", href: "/cadastro", variant: "secondary" },
+            { label: "Explorar o blog", href: "/blog", variant: "primary" },
+            { label: "Quero ser avisado(a)", href: "/como-funciona#lista-espera", variant: "secondary" },
           ],
         },
         3,
