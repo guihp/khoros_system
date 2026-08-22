@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AdminGate, useAdminToken } from "@/components/admin/AdminGate";
 import { fetchApi, ApiError } from "@/lib/api";
 import type { AdminLeadsResponse, LeadEntry } from "@/lib/api-types";
+import { formatBrazilMobileDisplay } from "@/lib/format-brazil-phone";
 
 type SourceFilter = "" | "waitlist" | "article";
 
@@ -26,6 +27,11 @@ function articleInfo(lead: LeadEntry): string | null {
   if (lead.article_title) return lead.article_title;
   if (lead.article_slug) return `/${lead.article_slug}`;
   return null;
+}
+
+function formatPhone(phone: string | null): string {
+  if (!phone) return "—";
+  return formatBrazilMobileDisplay(phone);
 }
 
 function formatDate(iso: string): string {
@@ -143,6 +149,7 @@ function LeadsList() {
                 <tr>
                   <th className="px-4 py-3 font-medium">Nome</th>
                   <th className="px-4 py-3 font-medium">E-mail</th>
+                  <th className="px-4 py-3 font-medium">Celular</th>
                   <th className="px-4 py-3 font-medium">Origem</th>
                   <th className="px-4 py-3 font-medium">Artigo</th>
                   <th className="px-4 py-3 font-medium">Cadastro</th>
@@ -153,6 +160,7 @@ function LeadsList() {
                   <tr key={lead.id} className="text-calm-900">
                     <td className="px-4 py-3">{lead.name}</td>
                     <td className="px-4 py-3 text-calm-700">{lead.email}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-calm-700">{formatPhone(lead.phone)}</td>
                     <td className="px-4 py-3">{sourceLabel(lead.source)}</td>
                     <td className="px-4 py-3 text-calm-700">{articleInfo(lead) ?? "—"}</td>
                     <td className="px-4 py-3 whitespace-nowrap text-calm-700">{formatDate(lead.created_at)}</td>
@@ -167,6 +175,7 @@ function LeadsList() {
               <div key={lead.id} className="rounded-card border border-calm-200 bg-white p-4">
                 <p className="font-medium text-calm-900">{lead.name}</p>
                 <p className="mt-1 text-sm text-calm-700">{lead.email}</p>
+                <p className="mt-1 text-sm text-calm-700">{formatPhone(lead.phone)}</p>
                 <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-calm-600">
                   <span>{sourceLabel(lead.source)}</span>
                   {articleInfo(lead) && <span>{articleInfo(lead)}</span>}

@@ -33,17 +33,12 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Onda 0: login só via /entrar (sem botão público). */}
             <Link
               href="/como-funciona#lista-espera"
-              className="text-xs sm:text-sm font-medium text-khoros-cyan-dark px-2 sm:px-3 py-2 hover:underline"
+              className="text-xs sm:text-sm font-medium bg-khoros-cyan text-white px-3 sm:px-4 py-2 rounded-full hover:bg-khoros-cyan-dark transition-colors"
             >
               Lista de espera
-            </Link>
-            <Link
-              href="/entrar"
-              className="text-sm font-medium bg-khoros-cyan text-white px-3 sm:px-4 py-2 rounded-full hover:bg-khoros-cyan-dark transition-colors"
-            >
-              Entrar
             </Link>
           </div>
         </div>

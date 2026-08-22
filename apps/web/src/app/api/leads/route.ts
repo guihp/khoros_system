@@ -5,6 +5,13 @@ import { createSupabaseAdmin } from "@/lib/blog/supabase";
 const leadSchema = z.object({
   name: z.string().min(2, "Nome muito curto"),
   email: z.string().email("E-mail inválido"),
+  phone: z
+    .string()
+    .min(1, "Celular obrigatório")
+    .transform((v) => v.replace(/\D/g, ""))
+    .refine((d) => /^\d{2}9\d{8}$/.test(d), {
+      message: "Celular inválido. Use o formato (XX) 9 XXXX-XXXX.",
+    }),
   /** Legado — plataforma é online; cidade não é mais coletada no formulário. */
   city: z.string().min(2).optional(),
   consent: z.literal(true, { errorMap: () => ({ message: "Consentimento obrigatório" }) }),
@@ -35,6 +42,7 @@ export async function POST(request: Request) {
       const { error } = await supabase.from("leads").insert({
         name: data.name,
         email: data.email.toLowerCase(),
+        phone: data.phone,
         city,
         article_slug: data.article_slug,
         article_category: data.article_category,

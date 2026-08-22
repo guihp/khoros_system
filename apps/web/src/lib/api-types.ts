@@ -219,6 +219,7 @@ export interface LeadEntry {
   id: string;
   name: string;
   email: string;
+  phone: string | null;
   city: string;
   article_slug: string | null;
   article_category: string | null;

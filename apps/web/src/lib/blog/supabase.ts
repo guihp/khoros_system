@@ -21,6 +21,7 @@ export function createSupabaseAdmin() {
 export interface LeadRecord {
   name: string;
   email: string;
+  phone: string;
   city: string;
   article_category?: string;
   article_slug?: string;

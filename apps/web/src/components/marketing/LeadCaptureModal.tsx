@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { trackEvent } from "@/lib/blog/analytics";
+import {
+  formatBrazilMobileDisplay,
+  isValidBrazilMobile,
+  normalizeBrazilMobileDigits,
+} from "@/lib/format-brazil-phone";
 
 interface LeadCaptureModalProps {
   open: boolean;
@@ -22,6 +27,7 @@ export function LeadCaptureModal({
 }: LeadCaptureModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneDigits, setPhoneDigits] = useState("");
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -32,6 +38,10 @@ export function LeadCaptureModal({
     e.preventDefault();
     if (!consent) {
       setErrorMsg("É necessário aceitar o consentimento para continuar.");
+      return;
+    }
+    if (!isValidBrazilMobile(phoneDigits)) {
+      setErrorMsg("Informe um celular válido no formato (XX) 9 XXXX-XXXX.");
       return;
     }
 
@@ -53,6 +63,7 @@ export function LeadCaptureModal({
         body: JSON.stringify({
           name,
           email,
+          phone: normalizeBrazilMobileDigits(phoneDigits),
           consent,
           article_slug: articleSlug,
           article_category: articleCategory,
@@ -157,6 +168,26 @@ export function LeadCaptureModal({
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-khoros-cyan"
                 />
+              </div>
+
+              <div>
+                <label htmlFor="lead-phone" className="block text-sm font-medium mb-1">
+                  Celular (WhatsApp)
+                </label>
+                <input
+                  id="lead-phone"
+                  type="tel"
+                  inputMode="numeric"
+                  autoComplete="tel"
+                  required
+                  placeholder="(11) 9 8765-4321"
+                  value={formatBrazilMobileDisplay(phoneDigits)}
+                  onChange={(e) => setPhoneDigits(normalizeBrazilMobileDigits(e.target.value))}
+                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-khoros-cyan"
+                />
+                <p className="mt-1 text-xs text-khoros-slate">
+                  Número com DDD. O 9 após o DDD é obrigatório para celular.
+                </p>
               </div>
 
               <label className="flex items-start gap-3 text-sm text-khoros-slate cursor-pointer">

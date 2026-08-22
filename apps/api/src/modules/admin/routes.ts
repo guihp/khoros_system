@@ -82,7 +82,7 @@ export async function registerAdminRoutes(app: FastifyInstance): Promise<void> {
     let dbQuery = app.supabase
       .from("leads")
       .select(
-        "id, name, email, city, article_slug, article_category, article_title, source, created_at",
+        "id, name, email, phone, city, article_slug, article_category, article_title, source, created_at",
         { count: "exact" },
       )
       .order("created_at", { ascending: false })

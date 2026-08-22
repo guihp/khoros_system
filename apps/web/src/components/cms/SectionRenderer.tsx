@@ -148,14 +148,6 @@ function CtaBandSection({ config }: { config: CmsSectionConfig<"cta_band"> }) {
             </Link>
           ))}
         </div>
-        {!buttons.some((b) => b.href.startsWith("/entrar")) && (
-          <p className="mt-5 text-sm text-khoros-slate">
-            Já tem conta?{" "}
-            <Link href="/entrar" className="text-khoros-cyan-dark font-medium hover:underline">
-              Entrar
-            </Link>
-          </p>
-        )}
       </div>
     </section>
   );
