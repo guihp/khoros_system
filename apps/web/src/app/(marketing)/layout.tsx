@@ -2,6 +2,7 @@ import { Source_Serif_4 } from "next/font/google";
 import { Header } from "@/components/marketing/Header";
 import { Footer } from "@/components/marketing/Footer";
 import { Analytics } from "@/components/marketing/Analytics";
+import { PageViewTracker } from "@/components/marketing/PageViewTracker";
 import { JsonLd } from "@/components/marketing/JsonLd";
 import { organizationSchema } from "@/lib/blog/schema";
 
@@ -23,6 +24,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <main className="flex-1">{children}</main>
       <Footer />
       <Analytics />
+      <PageViewTracker />
     </div>
   );
 }

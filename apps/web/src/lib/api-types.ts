@@ -235,6 +235,60 @@ export interface AdminLeadsResponse {
   offset: number;
 }
 
+export interface MetricsCountRow {
+  path?: string;
+  referrer?: string;
+  utm_source?: string;
+  utm_campaign?: string;
+  device_type?: string;
+  count: number;
+}
+
+export interface MetricsDailyRow {
+  day: string;
+  pageviews: number;
+  visitors: number;
+}
+
+export interface MetricsSummaryResponse {
+  from: string;
+  to: string;
+  pageviews: number;
+  unique_visitors: number;
+  unique_sessions: number;
+  leads_count: number;
+  funnel: Record<string, number>;
+  top_paths: { path: string; count: number }[];
+  top_referrers: { referrer: string; count: number }[];
+  top_utm_sources: { utm_source: string; count: number }[];
+  top_utm_campaigns: { utm_campaign: string; count: number }[];
+  devices: { device_type: string; count: number }[];
+  daily: MetricsDailyRow[];
+}
+
+export interface AnalyticsEventEntry {
+  id: string;
+  event_name: string;
+  path: string | null;
+  referrer: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  visitor_id: string | null;
+  session_id: string | null;
+  device_type: string | null;
+  article_slug: string | null;
+  article_category: string | null;
+  created_at: string;
+}
+
+export interface AdminMetricsEventsResponse {
+  items: AnalyticsEventEntry[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
 export interface CrpActionResponse {
   user_id: string;
   crp_status: CrpStatus;

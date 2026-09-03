@@ -179,3 +179,5 @@ Durante a validação (Onda 0), os CTAs **Sou paciente / Sou psicólogo** e o bo
 **Para relançar a plataforma transacional:** restaurar os links em `apps/web/src/components/marketing/Header.tsx` e reativar a expansão de `/cadastro` em `apps/web/src/components/cms/SectionRenderer.tsx` (ver comentário no arquivo). Atualizar também a seção `cta_band` da home no **admin CMS** (produção) — o seed em `packages/db/scripts/lib/marketing-pages.ts` só afeta re-seed, não o banco live.
 
 **Migration de leads:** aplicar `0007_leads.sql` no Supabase de produção para o formulário de waitlist e captura via artigos (`POST /api/leads`).
+
+**Migration de analytics:** aplicar `0009_analytics_events.sql` no Supabase de produção para pageviews/UTM first-party (`POST /api/events`) e o painel admin em `/admin/metricas`. Cookie anônimo `khoros_vid` (1 ano, sem PII). Plausible/GA continuam opcionais e independentes do painel.

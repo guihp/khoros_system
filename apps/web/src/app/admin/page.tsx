@@ -19,6 +19,11 @@ const SECTIONS = [
     title: "Lista de espera / Leads",
     description: "Contatos capturados pela waitlist e formulários de artigos.",
   },
+  {
+    href: "/admin/metricas",
+    title: "Métricas do blog",
+    description: "Pageviews, origem/UTM, dispositivos e funil de leads (Onda 0).",
+  },
 ] as const;
 
 function AdminHub() {
