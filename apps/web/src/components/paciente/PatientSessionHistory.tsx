@@ -1,4 +1,4 @@
-import { formatBRL } from "@khoros/shared";
+import { formatBRL, formatCrp } from "@khoros/shared";
 import type { PatientSessionHistoryItem } from "@/lib/api-types";
 import {
   formatSessionDuration,
@@ -44,7 +44,7 @@ export function PatientSessionHistory({
           <ul className="mt-4 divide-y divide-calm-100">
             {sessions.map((s) => {
               const crp =
-                s.crpNumero && s.crpRegiao ? `CRP ${s.crpNumero}/${s.crpRegiao}` : null;
+                formatCrp(s.crpRegiao, s.crpNumero);
               return (
                 <li
                   key={s.id}

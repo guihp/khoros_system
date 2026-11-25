@@ -8,12 +8,12 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center group">
             <Image
-              src="/logo.png"
-              alt="khoros"
-              width={140}
-              height={40}
+              src="/brand/logo-horizontal-green.png"
+              alt="KHOROS tecnologia"
+              width={1465}
+              height={400}
               priority
-              className="h-8 w-auto object-contain"
+              className="h-10 w-auto object-contain"
             />
           </Link>
 

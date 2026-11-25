@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -43,8 +44,15 @@ export function AppNav() {
   return (
     <nav className="w-full border-b border-calm-200 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-        <Link href={logoHref} className="font-display text-xl tracking-tight text-calm-900">
-          KHOROS
+        <Link href={logoHref} className="flex items-center" aria-label="KHOROS — início">
+          <Image
+            src="/brand/logo-horizontal-green.png"
+            alt="KHOROS tecnologia"
+            width={1465}
+            height={400}
+            priority
+            className="h-9 w-auto object-contain"
+          />
         </Link>
 
         <button

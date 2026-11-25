@@ -185,6 +185,12 @@ function CadastroForm() {
             onChange={(e) => setFullName(e.target.value)}
             className="rounded-md border border-calm-200 px-3 py-2.5 text-calm-900 outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-200"
           />
+          {role === "PSYCHOLOGIST" && (
+            <span className="text-xs text-calm-600">
+              Nome e sobrenome, como consta no registro do CRP. Seu perfil público exibe nome
+              completo, o título Psicólogo(a) e o CRP (região/número).
+            </span>
+          )}
         </label>
 
         <label className="flex flex-col gap-1.5">

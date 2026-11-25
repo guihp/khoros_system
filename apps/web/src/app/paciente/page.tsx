@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { formatBRL } from "@khoros/shared";
+import { formatBRL, formatCrp, PROFESSIONAL_TITLE } from "@khoros/shared";
 import { useAuth } from "@/lib/auth-context";
 import { fetchApi, ApiError } from "@/lib/api";
 import { roleHomePath } from "@/lib/complete-registration";
@@ -349,6 +349,10 @@ export default function PacientePage() {
                     <div className="flex flex-1 flex-col p-3 pb-0 md:p-4 md:pb-0">
                       <p className="line-clamp-2 text-sm font-semibold leading-snug text-calm-900 md:text-base">
                         {name}
+                      </p>
+                      <p className="mt-0.5 text-xs text-calm-600">
+                        {PROFESSIONAL_TITLE}
+                        {formatCrp(p.crp_regiao, p.crp_numero) ? ` · ${formatCrp(p.crp_regiao, p.crp_numero)}` : ""}
                       </p>
                       <p className="mt-1 text-sm font-medium text-calm-800">
                         {formatBRL(p.preco_por_minuto_centavos)}

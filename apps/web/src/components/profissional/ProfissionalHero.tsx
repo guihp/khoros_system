@@ -1,4 +1,4 @@
-import { formatBRL } from "@khoros/shared";
+import { formatBRL, formatCrp, PROFESSIONAL_TITLE } from "@khoros/shared";
 import { formatRatingValue } from "@/lib/format-rating";
 import type { PsychologistPublicProfile } from "@/lib/api-types";
 import { psychologistInitials } from "./format-profissional";
@@ -47,7 +47,7 @@ export function ProfissionalHero({
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full border border-calm-200 bg-calm-50 px-2.5 py-0.5 text-xs font-medium text-calm-800">
-                CRP {profile.crp_numero}/{profile.crp_regiao}
+                {formatCrp(profile.crp_regiao, profile.crp_numero)}
               </span>
               <span
                 className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
@@ -61,6 +61,7 @@ export function ProfissionalHero({
             <h1 className="mt-3 font-display text-3xl tracking-tight text-calm-900 sm:text-4xl">
               {name}
             </h1>
+            <p className="mt-1 text-sm font-medium text-calm-700">{PROFESSIONAL_TITLE}</p>
 
             <p className="mt-3 text-lg font-medium text-calm-900">
               {formatBRL(profile.preco_por_minuto_centavos)}

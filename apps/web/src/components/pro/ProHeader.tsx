@@ -1,3 +1,4 @@
+import { formatCrp } from "@khoros/shared";
 import Link from "next/link";
 import type { CrpStatus } from "@khoros/shared";
 import { firstName, greetingForNow } from "./format-pro";
@@ -29,9 +30,7 @@ export function ProHeader({
         </h1>
         {crpNumero && crpRegiao && (
           <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-calm-600">
-            <span>
-              CRP {crpNumero}/{crpRegiao}
-            </span>
+            <span>{formatCrp(crpRegiao, crpNumero)}</span>
             {verified ? (
               <span className="inline-flex items-center rounded-md bg-sage-100 px-2 py-0.5 text-xs font-medium text-sage-600">
                 Verificado

@@ -131,11 +131,29 @@ export default function ConsentimentosPage() {
               {status?.versaoTermo ? ` (versão ${status.versaoTermo})` : ""}
             </h2>
             <p className="mt-2 text-sm text-calm-600">
-              O atendimento é realizado por psicólogo com inscrição ativa no CRP, por vídeo.
-              Sessões não são gravadas. Em caso de crise, urgência ou emergência, a plataforma
-              encaminha para canais especializados (CVV, SAMU, CAPS) — não realiza atendimento
-              presencial nem de emergência.
+              Este é o termo de consentimento para <strong>atendimento psicológico online</strong>{" "}
+              (teleatendimento por vídeo), conforme a Resolução CFP nº 09/2024.
             </p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-calm-600">
+              <li>
+                O atendimento é realizado por psicólogo(a) identificado(a) com nome completo e
+                inscrição ativa no CRP (região/número), em território nacional.
+              </li>
+              <li>
+                As sessões não são gravadas. Somente o(a) psicólogo(a) responsável pelo seu
+                atendimento acessa seus registros e prontuário, protegidos por criptografia.
+              </li>
+              <li>
+                Recomendamos estar em local privado, com conexão estável. Falhas técnicas podem
+                interromper a sessão.
+              </li>
+              <li>
+                O atendimento online não é indicado para situações de crise, urgência ou
+                emergência: nesses casos a plataforma encaminha para canais especializados (CVV
+                188, SAMU 192, CAPS) e não realiza atendimento presencial nem de emergência.
+              </li>
+              <li>Você pode retirar este consentimento e encerrar o atendimento a qualquer momento.</li>
+            </ul>
             <label className="mt-3 flex items-start gap-2 text-sm text-calm-800">
               <input
                 type="checkbox"
@@ -143,7 +161,8 @@ export default function ConsentimentosPage() {
                 onChange={(e) => setTermoAceito(e.target.checked)}
                 className="mt-0.5"
               />
-              Li e aceito o Termo de Consentimento Livre e Esclarecido.
+              Li e aceito o Termo de Consentimento Livre e Esclarecido para atendimento
+              psicológico online.
             </label>
           </section>
 

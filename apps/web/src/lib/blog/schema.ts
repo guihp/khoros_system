@@ -8,7 +8,7 @@ export function organizationSchema() {
     name: siteConfig.name,
     url: siteConfig.url,
     description: siteConfig.description,
-    logo: `${siteConfig.url}/logo.png`,
+    logo: `${siteConfig.url}/brand/logo-green.png`,
   };
 }
 
@@ -32,7 +32,7 @@ export function articleSchema(article: Article, categoryName: string) {
       name: siteConfig.name,
       logo: {
         "@type": "ImageObject",
-        url: `${siteConfig.url}/logo.png`,
+        url: `${siteConfig.url}/brand/logo-green.png`,
       },
     },
     mainEntityOfPage: {

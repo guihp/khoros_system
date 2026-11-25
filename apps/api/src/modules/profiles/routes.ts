@@ -11,6 +11,7 @@ import {
   patientProfileUpdateSchema,
   proProfileUpdateSchema,
   psychologistsQuerySchema,
+  hasPublicIdentification,
 } from "@khoros/shared";
 import { getPlatformSettings } from "../../lib/settings.js";
 import { countEndedSessions, getAvaliacaoSummary, getCompactStatsBatch } from "../../lib/reviews.js";
@@ -28,6 +29,16 @@ const PSY_PUBLIC_SELECT =
 
 const PATIENT_PROFILE_SELECT =
   "cidade, data_nascimento, responsavel_legal_id, foto_url, bio, mostrar_nome_real, camera_ligada_padrao";
+
+function isPubliclyIdentified(p: {
+  crp_numero: string | null;
+  crp_regiao: string | null;
+  users: unknown;
+}): boolean {
+  const users = p.users as { full_name: string | null } | { full_name: string | null }[] | null;
+  const fullName = Array.isArray(users) ? users[0]?.full_name : users?.full_name;
+  return hasPublicIdentification({ fullName, crpRegiao: p.crp_regiao, crpNumero: p.crp_numero });
+}
 
 export async function registerProfileRoutes(app: FastifyInstance): Promise<void> {
   app.get("/psychologists", { preHandler: app.requireAuth }, async (req, reply) => {
@@ -63,7 +74,8 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
     const { data, error } = await query;
     if (error) return reply.code(500).send({ error: "QUERY_FAILED", message: error.message });
 
-    let items = data ?? [];
+    // CFP: só entra no cardápio quem tem Nome completo + CRP (Região/Número).
+    let items = (data ?? []).filter((p) => isPubliclyIdentified(p));
 
     if (filters.q) {
       const needle = filters.q.toLocaleLowerCase("pt-BR");
@@ -100,7 +112,7 @@ export async function registerProfileRoutes(app: FastifyInstance): Promise<void>
       .eq("crp_status", "VERIFIED")
       .maybeSingle();
     if (error) return reply.code(500).send({ error: "QUERY_FAILED", message: error.message });
-    if (!data) return reply.code(404).send({ error: "NOT_FOUND" });
+    if (!data || !isPubliclyIdentified(data)) return reply.code(404).send({ error: "NOT_FOUND" });
 
     const [consultasRealizadas, avaliacao] = await Promise.all([
       countEndedSessions(app.supabase, req.params.id),

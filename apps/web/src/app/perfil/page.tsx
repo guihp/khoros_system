@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AVATAR_MAX_BYTES, BIO_MAX_LENGTH, formatBRL } from "@khoros/shared";
+import { AVATAR_MAX_BYTES, BIO_MAX_LENGTH, formatBRL, formatCrp } from "@khoros/shared";
 import { useAuth } from "@/lib/auth-context";
 import { fetchApi, uploadApiFile, ApiError } from "@/lib/api";
 import type { AvatarUploadResponse, PatientProfileApi, PsychologistProfileApi } from "@/lib/api-types";
@@ -258,7 +258,7 @@ function PsychologistProfileForm({
             {profile && (
               <div className="mt-2.5 flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center rounded-full border border-calm-200 bg-calm-50 px-2.5 py-0.5 text-xs font-medium text-calm-800">
-                  CRP {profile.crp_numero}/{profile.crp_regiao}
+                  {formatCrp(profile.crp_regiao, profile.crp_numero)}
                 </span>
                 <span
                   className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${

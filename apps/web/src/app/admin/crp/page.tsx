@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AdminGate, useAdminToken } from "@/components/admin/AdminGate";
+import { formatCrp } from "@khoros/shared";
 import { fetchApi, ApiError } from "@/lib/api";
 import type { PendingCrpEntry, PendingCrpResponse } from "@/lib/api-types";
 
@@ -74,7 +75,7 @@ function CrpQueue() {
               <div>
                 <p className="text-base font-medium text-calm-900">{p.users?.full_name ?? "Psicólogo"}</p>
                 <p className="text-sm text-calm-600">
-                  CRP {p.crp_numero}/{p.crp_regiao}
+                  {formatCrp(p.crp_regiao, p.crp_numero)}
                   {p.users?.email ? ` · ${p.users.email}` : ""}
                 </p>
                 {p.users?.created_at && (

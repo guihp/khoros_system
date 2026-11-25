@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/blog/site";
 import { CrisisResources } from "./CrisisResources";
@@ -8,7 +9,13 @@ export function Footer() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid md:grid-cols-3 gap-8 mb-10">
           <div>
-            <p className="font-semibold text-lg mb-2">{siteConfig.name}</p>
+            <Image
+              src="/brand/logo-horizontal-white.png"
+              alt={siteConfig.name}
+              width={1465}
+              height={400}
+              className="h-11 w-auto object-contain mb-3"
+            />
             <p className="text-sm text-white/70 leading-relaxed">
               {siteConfig.description}
             </p>

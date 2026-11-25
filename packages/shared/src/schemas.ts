@@ -71,6 +71,13 @@ export const registerSchema = z
       ctx.addIssue({ code: "custom", message: "birthDate é obrigatório para paciente", path: ["birthDate"] });
     }
     if (data.role === "PSYCHOLOGIST") {
+      if (data.fullName.trim().split(/\s+/).filter((part) => part.length >= 2).length < 2) {
+        ctx.addIssue({
+          code: "custom",
+          message: "Informe o nome completo (nome e sobrenome), como no registro do CRP",
+          path: ["fullName"],
+        });
+      }
       if (!data.crpNumero) {
         ctx.addIssue({ code: "custom", message: "crpNumero é obrigatório", path: ["crpNumero"] });
       }
