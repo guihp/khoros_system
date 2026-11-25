@@ -57,5 +57,5 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   // Fora: API routes, assets do Next, arquivos com extensão (imagens, sitemap.xml, robots.txt).
-  matcher: ["/((?!api/|_next/|.*\.[a-zA-Z0-9]+$).*)"],
+  matcher: ["/((?!api/|_next/|.*[.][a-zA-Z0-9]+$).*)"],
 };
