@@ -1,26 +1,33 @@
 import type { Metadata } from "next";
-import { Montserrat, DM_Sans, Source_Serif_4 } from "next/font/google";
+import localFont from "next/font/local";
 import { SupportBanner } from "@/components/SupportBanner";
 import { AppShell } from "@/components/AppShell";
 import { AuthProvider } from "@/lib/auth-context";
 import { siteConfig } from "@/lib/blog/site";
 import "./globals.css";
 
-const montserrat = Montserrat({
-  subsets: ["latin"],
+// Fontes hospedadas no próprio projeto (variáveis, subset latin): build não
+// depende do Google Fonts e o visitante não faz requisição a terceiros (LGPD).
+const montserrat = localFont({
+  src: [{ path: "../fonts/montserrat-normal.woff2", weight: "500 700", style: "normal" }],
   variable: "--font-heading",
-  weight: ["500", "600", "700"],
   display: "swap",
 });
 
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
+const sourceSerif = localFont({
+  src: [
+    { path: "../fonts/sourceserif4-normal.woff2", weight: "200 900", style: "normal" },
+    { path: "../fonts/sourceserif4-italic.woff2", weight: "200 900", style: "italic" },
+  ],
   variable: "--font-reading",
   display: "swap",
 });
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
+const dmSans = localFont({
+  src: [
+    { path: "../fonts/dmsans-normal.woff2", weight: "100 1000", style: "normal" },
+    { path: "../fonts/dmsans-italic.woff2", weight: "100 1000", style: "italic" },
+  ],
   variable: "--font-body",
   display: "swap",
 });
