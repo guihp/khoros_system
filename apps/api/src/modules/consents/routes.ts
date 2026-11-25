@@ -5,7 +5,7 @@
  */
 
 import type { FastifyInstance } from "fastify";
-import { consentAcceptSchema } from "@khoros/shared";
+import { consentAcceptSchema, DEFAULT_TERMO_CONSENTIMENTO, DEFAULT_TERMO_LGPD } from "@khoros/shared";
 import { getPlatformSettings } from "../../lib/settings.js";
 
 function calculateAge(birthDateISO: string, nowMs = Date.now()): number {
@@ -36,6 +36,8 @@ export async function registerConsentRoutes(app: FastifyInstance): Promise<void>
     const settings = await getPlatformSettings(app.supabase, [
       "versao_termo_consentimento",
       "versao_termo_lgpd",
+      "texto_termo_consentimento",
+      "texto_termo_lgpd",
     ]);
     const versaoTermo = String(settings.versao_termo_consentimento ?? "");
     const versaoLgpd = String(settings.versao_termo_lgpd ?? "");
@@ -58,6 +60,8 @@ export async function registerConsentRoutes(app: FastifyInstance): Promise<void>
       responsavelLegalOk: minor ? (consents ?? []).some((c) => c.tipo === "RESPONSAVEL_LEGAL") : true,
       versaoTermo,
       versaoLgpd,
+      textoTermo: String(settings.texto_termo_consentimento || DEFAULT_TERMO_CONSENTIMENTO),
+      textoLgpd: String(settings.texto_termo_lgpd || DEFAULT_TERMO_LGPD),
     });
   });
 

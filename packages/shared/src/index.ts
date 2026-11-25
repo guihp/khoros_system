@@ -4,3 +4,4 @@ export * from "./schemas.js";
 export * from "./money.js";
 export * from "./cms.js";
 export * from "./professional.js";
+export * from "./terms.js";

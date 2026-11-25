@@ -1,14 +1,18 @@
 "use client";
 
+import { APP_PREFIXES, matchesPrefix } from "@/lib/hosts";
 import { usePathname } from "next/navigation";
 import { AppNav } from "@/components/AppNav";
 
 /** Rotas da sala de consulta (paciente `/sessao/:id` e psicólogo `/pro/sessao/:id`). */
 const CALL_ROUTE_PATTERN = /^\/(pro\/)?sessao\//;
 
-/** Rotas de marketing (blog Onda 0) — usam Header/Footer próprios. */
-const MARKETING_ROUTE_PATTERN =
-  /^\/$|^\/blog(\/|$)|^\/faq$|^\/como-funciona$|^\/sobre$|^\/politicas(\/|$)/;
+/**
+ * Só as rotas do sistema usam a nav do app. Todo o resto é site/blog (com
+ * Header/Footer próprios) — inclusive as URLs do blog. que chegam reescritas
+ * pelo middleware, cujo pathname no navegador não tem o prefixo /blog.
+ */
+const APP_SHELL_PREFIXES = [...APP_PREFIXES, "/apoio"];
 
 /**
  * Envolve as páginas com a navegação e o rodapé padrão do site — exceto nas
@@ -19,7 +23,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const path = pathname ?? "";
   const isCallRoute = CALL_ROUTE_PATTERN.test(path);
-  const isMarketingRoute = MARKETING_ROUTE_PATTERN.test(path);
+  const isMarketingRoute = !matchesPrefix(path, APP_SHELL_PREFIXES);
 
   if (isCallRoute || isMarketingRoute) {
     return <div className="flex-1 flex flex-col min-h-0">{children}</div>;

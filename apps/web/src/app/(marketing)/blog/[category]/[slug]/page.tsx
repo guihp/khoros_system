@@ -1,3 +1,4 @@
+import { BLOG_URL, blogHref } from "@/lib/hosts";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -57,10 +58,10 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
       type: "article",
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt || article.publishedAt,
-      url: `${siteConfig.url}/blog/${category}/${slug}`,
+      url: `${BLOG_URL}/${category}/${slug}`,
     },
     alternates: {
-      canonical: `/blog/${category}/${slug}`,
+      canonical: `${BLOG_URL}/${category}/${slug}`,
     },
   };
 }
@@ -82,14 +83,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           articleSchema(article, categoryName),
           breadcrumbSchema([
             { name: "Início", url: siteConfig.url },
-            { name: "Blog", url: `${siteConfig.url}/blog` },
+            { name: "Blog", url: `${BLOG_URL}` },
             {
               name: categoryName,
-              url: `${siteConfig.url}/blog/categoria/${category}`,
+              url: `${BLOG_URL}/categoria/${category}`,
             },
             {
               name: article.title,
-              url: `${siteConfig.url}/blog/${category}/${slug}`,
+              url: `${BLOG_URL}/${category}/${slug}`,
             },
           ]),
           ...(faqs.length > 0 ? [faqPageSchema(faqs)] : []),
@@ -104,9 +105,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         )}
 
         <nav className="text-sm text-calm-500 mb-8" aria-label="Trilha">
-          <Link href="/blog" className="hover:text-brand-700">Blog</Link>
+          <Link href={blogHref("/")} className="hover:text-brand-700">Blog</Link>
           <span className="mx-2" aria-hidden>/</span>
-          <Link href={`/blog/categoria/${category}`} className="hover:text-brand-700">
+          <Link href={blogHref(`/categoria/${category}`)} className="hover:text-brand-700">
             {categoryName}
           </Link>
         </nav>

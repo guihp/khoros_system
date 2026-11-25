@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { fetchApi, ApiError } from "@/lib/api";
 import type { ConsentStatusResponse } from "@/lib/api-types";
+import { DEFAULT_TERMO_CONSENTIMENTO, DEFAULT_TERMO_LGPD } from "@khoros/shared";
+import { TermText } from "@/components/TermText";
 
 export default function ConsentimentosPage() {
   const { session, loading: authLoading, refresh } = useAuth();
@@ -130,30 +132,7 @@ export default function ConsentimentosPage() {
               Termo de Consentimento Livre e Esclarecido
               {status?.versaoTermo ? ` (versão ${status.versaoTermo})` : ""}
             </h2>
-            <p className="mt-2 text-sm text-calm-600">
-              Este é o termo de consentimento para <strong>atendimento psicológico online</strong>{" "}
-              (teleatendimento por vídeo), conforme a Resolução CFP nº 09/2024.
-            </p>
-            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-calm-600">
-              <li>
-                O atendimento é realizado por psicólogo(a) identificado(a) com nome completo e
-                inscrição ativa no CRP (região/número), em território nacional.
-              </li>
-              <li>
-                As sessões não são gravadas. Somente o(a) psicólogo(a) responsável pelo seu
-                atendimento acessa seus registros e prontuário, protegidos por criptografia.
-              </li>
-              <li>
-                Recomendamos estar em local privado, com conexão estável. Falhas técnicas podem
-                interromper a sessão.
-              </li>
-              <li>
-                O atendimento online não é indicado para situações de crise, urgência ou
-                emergência: nesses casos a plataforma encaminha para canais especializados (CVV
-                188, SAMU 192, CAPS) e não realiza atendimento presencial nem de emergência.
-              </li>
-              <li>Você pode retirar este consentimento e encerrar o atendimento a qualquer momento.</li>
-            </ul>
+            <TermText text={status?.textoTermo || DEFAULT_TERMO_CONSENTIMENTO} className="mt-2" />
             <label className="mt-3 flex items-start gap-2 text-sm text-calm-800">
               <input
                 type="checkbox"
@@ -171,11 +150,7 @@ export default function ConsentimentosPage() {
               Privacidade e proteção de dados — LGPD
               {status?.versaoLgpd ? ` (versão ${status.versaoLgpd})` : ""}
             </h2>
-            <p className="mt-2 text-sm text-calm-600">
-              Seus dados de saúde são sensíveis: usamos criptografia em repouso e em trânsito, e
-              apenas o psicólogo responsável pelo seu atendimento acessa seu prontuário. Você
-              pode solicitar exportação ou exclusão dos seus dados a qualquer momento.
-            </p>
+            <TermText text={status?.textoLgpd || DEFAULT_TERMO_LGPD} className="mt-2" />
             <label className="mt-3 flex items-start gap-2 text-sm text-calm-800">
               <input
                 type="checkbox"

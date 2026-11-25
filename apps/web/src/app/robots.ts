@@ -1,13 +1,15 @@
 import type { MetadataRoute } from "next";
-import { siteConfig } from "@/lib/blog/site";
+import { BLOG_URL, SITE_URL } from "@/lib/hosts";
+import { currentHostKind } from "@/lib/request-host";
 
-export default function robots(): MetadataRoute.Robots {
+export const dynamic = "force-dynamic";
+
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  const kind = await currentHostKind();
+  // O sistema (app.) é área logada: nada para indexar.
+  if (kind === "app") return { rules: { userAgent: "*", disallow: "/" } };
   return {
-    rules: {
-      userAgent: "*",
-      allow: "/",
-      disallow: ["/api/"],
-    },
-    sitemap: `${siteConfig.url}/sitemap.xml`,
+    rules: { userAgent: "*", allow: "/", disallow: ["/api/"] },
+    sitemap: `${kind === "blog" ? BLOG_URL : SITE_URL}/sitemap.xml`,
   };
 }

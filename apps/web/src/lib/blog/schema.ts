@@ -1,3 +1,4 @@
+import { BLOG_URL } from "@/lib/hosts";
 import { siteConfig } from "./site";
 import type { Article, ArticleFAQ } from "./content";
 
@@ -37,7 +38,7 @@ export function articleSchema(article: Article, categoryName: string) {
     },
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${siteConfig.url}/blog/${article.category}/${article.slug}`,
+      "@id": `${BLOG_URL}/${article.category}/${article.slug}`,
     },
     articleSection: categoryName,
   };

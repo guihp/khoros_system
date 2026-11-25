@@ -1,9 +1,11 @@
+import { SITE_URL } from "@/lib/hosts";
+
 export const siteConfig = {
   name: "KHOROS",
   tagline: "Saúde mental com acolhimento e acesso na hora",
   description:
     "Blog sobre saúde mental e psicologia. Conteúdo baseado em evidências para educar, acolher e ajudar você a cuidar da sua saúde emocional.",
-  url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+  url: SITE_URL,
   locale: "pt_BR",
   author: {
     name: "Equipe KHOROS",

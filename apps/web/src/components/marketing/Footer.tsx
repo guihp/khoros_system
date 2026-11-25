@@ -1,3 +1,4 @@
+import { blogHref, siteHref } from "@/lib/hosts";
 import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/lib/blog/site";
@@ -7,10 +8,10 @@ const COLUMNS = [
   {
     title: "Conteúdo",
     links: [
-      { href: "/blog", label: "Blog" },
-      { href: "/como-funciona", label: "Como funciona" },
-      { href: "/sobre", label: "Sobre a KHOROS" },
-      { href: "/faq", label: "Perguntas frequentes" },
+      { href: blogHref("/"), label: "Blog" },
+      { href: siteHref("/como-funciona"), label: "Como funciona" },
+      { href: siteHref("/sobre"), label: "Sobre a KHOROS" },
+      { href: siteHref("/faq"), label: "Perguntas frequentes" },
     ],
   },
   {

@@ -15,6 +15,11 @@ const SECTIONS = [
     description: "Artigos, categorias, mídia e páginas do marketing / blog.",
   },
   {
+    href: "/admin/termos",
+    title: "Termos de consentimento",
+    description: "Editar o TCLE e o termo de privacidade (LGPD) e pedir novo aceite dos pacientes.",
+  },
+  {
     href: "/admin/leads",
     title: "Lista de espera / Leads",
     description: "Contatos capturados pela waitlist e formulários de artigos.",

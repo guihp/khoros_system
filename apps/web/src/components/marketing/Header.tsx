@@ -1,25 +1,29 @@
 "use client";
 
+import { blogHref, siteHref } from "@/lib/hosts";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const NAV = [
-  { href: "/blog", label: "Blog" },
-  { href: "/como-funciona", label: "Como funciona" },
-  { href: "/sobre", label: "Sobre" },
-  { href: "/faq", label: "FAQ" },
+  { href: blogHref("/"), match: "/blog", label: "Blog" },
+  { href: siteHref("/como-funciona"), match: "/como-funciona", label: "Como funciona" },
+  { href: siteHref("/sobre"), match: "/sobre", label: "Sobre" },
+  { href: siteHref("/faq"), match: "/faq", label: "FAQ" },
 ];
 
-function isActive(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
+function isActive(pathname: string, match: string, onBlogHost: boolean) {
+  if (match === "/blog" && onBlogHost) return true;
+  return pathname === match || pathname.startsWith(`${match}/`);
 }
 
 export function Header() {
   const pathname = usePathname() ?? "/";
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [onBlogHost, setOnBlogHost] = useState(false);
+  useEffect(() => setOnBlogHost(window.location.hostname.startsWith("blog.")), []);
 
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
@@ -39,7 +43,7 @@ export function Header() {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-[72px]">
-          <Link href="/" className="flex shrink-0 items-center" aria-label="KHOROS — página inicial">
+          <Link href={siteHref("/")} className="flex shrink-0 items-center" aria-label="KHOROS — página inicial">
             <Image
               src="/brand/logo-horizontal-green.png"
               alt="KHOROS tecnologia"
@@ -52,7 +56,7 @@ export function Header() {
 
           <nav className="hidden md:flex items-center gap-1" aria-label="Principal">
             {NAV.map((item) => {
-              const active = isActive(pathname, item.href);
+              const active = isActive(pathname, item.match, onBlogHost);
               return (
                 <Link
                   key={item.href}
@@ -72,7 +76,7 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             {/* Onda 0: login só via /entrar (sem botão público). */}
-            <Link href="/como-funciona#lista-espera" className="btn-primary !px-3.5 sm:!px-4 !py-2 !text-[13px] sm:!text-sm whitespace-nowrap">
+            <Link href={siteHref("/como-funciona#lista-espera")} className="btn-primary !px-3.5 sm:!px-4 !py-2 !text-[13px] sm:!text-sm whitespace-nowrap">
               Lista de espera
             </Link>
             <button
@@ -98,7 +102,7 @@ export function Header() {
                   <Link
                     href={item.href}
                     className={`block rounded-xl px-4 py-3 text-base font-medium ${
-                      isActive(pathname, item.href) ? "bg-brand-50 text-brand-800" : "text-calm-700 hover:bg-calm-100"
+                      isActive(pathname, item.match, onBlogHost) ? "bg-brand-50 text-brand-800" : "text-calm-700 hover:bg-calm-100"
                     }`}
                   >
                     {item.label}

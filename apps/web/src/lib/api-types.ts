@@ -60,6 +60,14 @@ export interface ConsentStatusResponse {
   responsavelLegalOk: boolean;
   versaoTermo: string;
   versaoLgpd: string;
+  textoTermo?: string;
+  textoLgpd?: string;
+}
+
+export interface AdminTermItem {
+  tipo: "TERMO_CONSENTIMENTO" | "LGPD";
+  versao: string;
+  texto: string;
 }
 
 export interface PsychologistListItem {

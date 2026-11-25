@@ -1,3 +1,4 @@
+import { blogHref } from "@/lib/hosts";
 import Image from "next/image";
 import Link from "next/link";
 import type { CmsSection, CmsSectionConfig } from "@khoros/shared";
@@ -133,7 +134,7 @@ async function CategoryGridSection({ config }: { config: CmsSectionConfig<"categ
         {featured.map((cat) => (
           <Link
             key={cat.slug}
-            href={`/blog/categoria/${cat.slug}`}
+            href={blogHref(`/categoria/${cat.slug}`)}
             className="group bg-white rounded-[var(--radius-card)] overflow-hidden ring-1 ring-calm-200 hover:ring-brand-200 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-lift)] hover:-translate-y-0.5 transition-all duration-300"
           >
             <CategoryImage src={cat.image} alt={cat.imageAlt} variant="card" />
@@ -147,7 +148,7 @@ async function CategoryGridSection({ config }: { config: CmsSectionConfig<"categ
         ))}
       </div>
       <div className="text-center mt-8">
-        <Link href="/blog" className="btn-secondary">
+        <Link href={blogHref("/")} className="btn-secondary">
           Ver todos os temas
         </Link>
       </div>

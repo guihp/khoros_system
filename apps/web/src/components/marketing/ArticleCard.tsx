@@ -1,3 +1,4 @@
+import { blogHref } from "@/lib/hosts";
 import Link from "next/link";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -22,7 +23,7 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
       }`}
     >
       <Link
-        href={`/blog/${article.category}/${article.slug}`}
+        href={blogHref(`/${article.category}/${article.slug}`)}
         className={`flex h-full flex-col ${featured ? "md:grid md:grid-cols-2" : ""}`}
       >
         <CategoryImage

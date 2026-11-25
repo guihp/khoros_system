@@ -1,11 +1,13 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { BLOG_URL } from "@/lib/hosts";
 import { getAllArticles } from "@/lib/blog/content";
 import { getAllCategories } from "@/lib/blog/categories";
 import { ArticleCard } from "@/components/marketing/ArticleCard";
 import { CategoryFilter } from "@/components/marketing/CategoryFilter";
 
 export const metadata: Metadata = {
+  alternates: { canonical: `${BLOG_URL}/` },
   title: "Blog — Saúde mental e psicologia",
   description:
     "Artigos sobre ansiedade, burnout, terapia, autoestima e mais. Conteúdo acolhedor e baseado em evidências.",

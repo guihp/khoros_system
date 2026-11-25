@@ -4,9 +4,70 @@
  */
 
 import type { FastifyInstance } from "fastify";
-import { crpActionSchema } from "@khoros/shared";
+import {
+  crpActionSchema,
+  DEFAULT_TERMO_CONSENTIMENTO,
+  DEFAULT_TERMO_LGPD,
+  nextTermVersion,
+  termUpdateSchema,
+} from "@khoros/shared";
+import { getPlatformSettings } from "../../lib/settings.js";
+
+const TERM_KEYS = {
+  TERMO_CONSENTIMENTO: { versao: "versao_termo_consentimento", texto: "texto_termo_consentimento", fallback: DEFAULT_TERMO_CONSENTIMENTO },
+  LGPD: { versao: "versao_termo_lgpd", texto: "texto_termo_lgpd", fallback: DEFAULT_TERMO_LGPD },
+} as const;
 
 export async function registerAdminRoutes(app: FastifyInstance): Promise<void> {
+  /** Termos (TCLE + LGPD): texto e versão vigentes, editáveis pelo admin. */
+  app.get("/admin/terms", { preHandler: app.requireRole("ADMIN") }, async (_req, reply) => {
+    const s = await getPlatformSettings(app.supabase, [
+      "versao_termo_consentimento",
+      "texto_termo_consentimento",
+      "versao_termo_lgpd",
+      "texto_termo_lgpd",
+    ]);
+    return reply.send({
+      items: (Object.keys(TERM_KEYS) as (keyof typeof TERM_KEYS)[]).map((tipo) => {
+        const k = TERM_KEYS[tipo];
+        return {
+          tipo,
+          versao: String(s[k.versao] ?? ""),
+          texto: String(s[k.texto] || k.fallback),
+        };
+      }),
+    });
+  });
+
+  app.put("/admin/terms", { preHandler: app.requireRole("ADMIN") }, async (req, reply) => {
+    if (!req.authUser) return reply.code(401).send({ error: "UNAUTHENTICATED" });
+    const parsed = termUpdateSchema.safeParse(req.body);
+    if (!parsed.success) return reply.code(400).send({ error: "VALIDATION", issues: parsed.error.issues });
+    const { tipo, texto, exigirReaceite } = parsed.data;
+    const k = TERM_KEYS[tipo];
+
+    const current = await getPlatformSettings(app.supabase, [k.versao]);
+    const versaoAnterior = String(current[k.versao] ?? "");
+    const versao = exigirReaceite ? nextTermVersion(versaoAnterior) : versaoAnterior;
+    const now = new Date().toISOString();
+
+    const rows: { key: string; value: unknown; updated_at: string }[] = [{ key: k.texto, value: texto, updated_at: now }];
+    if (versao !== versaoAnterior) rows.push({ key: k.versao, value: versao, updated_at: now });
+    const { error } = await app.supabase.from("platform_settings").upsert(rows, { onConflict: "key" });
+    if (error) return reply.code(500).send({ error: "UPDATE_FAILED", message: error.message });
+
+    await app.supabase.from("audit_log").insert({
+      actor_id: req.authUser.id,
+      acao: exigirReaceite ? "TERM_NEW_VERSION" : "TERM_TEXT_EDITED",
+      entidade: "platform_settings",
+      entidade_id: k.texto,
+      ip: req.ip,
+      metadata: { tipo, versaoAnterior, versao },
+    });
+
+    return reply.send({ tipo, versao, texto });
+  });
+
   app.get("/admin/crp/pending", { preHandler: app.requireRole("ADMIN") }, async (_req, reply) => {
     const { data, error } = await app.supabase
       .from("psychologist_profiles")

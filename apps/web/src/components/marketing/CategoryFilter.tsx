@@ -1,5 +1,6 @@
 "use client";
 
+import { blogHref } from "@/lib/hosts";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -14,7 +15,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
   return (
     <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex gap-2 mb-10 overflow-x-auto sm:flex-wrap pb-1 [scrollbar-width:none]">
       <Link
-        href="/blog"
+        href={blogHref("/")}
         className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ring-1 ${
           !active
             ? "bg-brand-600 text-white ring-brand-600"
@@ -26,7 +27,7 @@ export function CategoryFilter({ categories }: CategoryFilterProps) {
       {categories.map((cat) => (
         <Link
           key={cat.slug}
-          href={`/blog?categoria=${cat.slug}`}
+          href={blogHref(`/?categoria=${cat.slug}`)}
           className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ring-1 ${
             active === cat.slug
               ? "bg-brand-600 text-white ring-brand-600"

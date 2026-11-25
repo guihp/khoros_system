@@ -1,3 +1,4 @@
+import { BLOG_URL, blogHref } from "@/lib/hosts";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -54,8 +55,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         data={[
           breadcrumbSchema([
             { name: "Início", url: siteConfig.url },
-            { name: "Blog", url: `${siteConfig.url}/blog` },
-            { name: category.name, url: `${siteConfig.url}/blog/categoria/${slug}` },
+            { name: "Blog", url: `${BLOG_URL}` },
+            { name: category.name, url: `${BLOG_URL}/categoria/${slug}` },
           ]),
           ...(faqs.length > 0 ? [faqPageSchema(faqs)] : []),
         ]}
@@ -63,7 +64,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-20">
         <nav className="text-sm text-calm-500 mb-8" aria-label="Trilha">
-          <Link href="/blog" className="hover:text-brand-700">Blog</Link>
+          <Link href={blogHref("/")} className="hover:text-brand-700">Blog</Link>
           <span className="mx-2" aria-hidden>/</span>
           <span className="text-calm-800">{category.name}</span>
         </nav>
