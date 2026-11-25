@@ -65,9 +65,21 @@ function mapArticle(row: CmsArticleRow): Article {
   };
 }
 
+/**
+ * CMS vazio não pode derrubar o site: home, blog e sitemap renderizam sem
+ * artigos (e o healthcheck/admin continuam acessíveis para publicar conteúdo).
+ */
 export async function getAllArticles(): Promise<Article[]> {
-  const rows = await fetchCmsArticles();
-  return rows.map(mapArticle);
+  try {
+    const rows = await fetchCmsArticles();
+    return rows.map(mapArticle);
+  } catch (err) {
+    if (err instanceof CmsEmptyError) {
+      console.warn(`[cms] ${err.message}`);
+      return [];
+    }
+    throw err;
+  }
 }
 
 export async function getArticleBySlug(

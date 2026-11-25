@@ -1,4 +1,4 @@
-import { fetchCmsCategories, resolveCmsImage } from "@/lib/cms/client";
+import { CmsEmptyError, fetchCmsCategories, resolveCmsImage } from "@/lib/cms/client";
 import {
   categoriesLegacy,
   type Category,
@@ -11,7 +11,16 @@ export const categories = categoriesLegacy;
 export const categoriesLegacyBackup = categoriesLegacy;
 
 export async function getAllCategories(): Promise<Category[]> {
-  const rows = await fetchCmsCategories();
+  let rows: Awaited<ReturnType<typeof fetchCmsCategories>>;
+  try {
+    rows = await fetchCmsCategories();
+  } catch (err) {
+    if (err instanceof CmsEmptyError) {
+      console.warn(`[cms] ${err.message}`);
+      return [];
+    }
+    throw err;
+  }
   return rows.map((row) => {
     const image = resolveCmsImage(row.legacy_image_path, row.image_media);
     return {

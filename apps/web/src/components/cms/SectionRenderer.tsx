@@ -70,6 +70,7 @@ async function CategoryGridSection({ config }: { config: CmsSectionConfig<"categ
   const publishedSlugs = new Set(articles.map((a) => a.category));
   const visibleCategories = categories.filter((c) => publishedSlugs.has(c.slug));
   const featured = visibleCategories.slice(0, config.limit ?? 6);
+  if (featured.length === 0) return null;
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
       <h2 className="text-2xl font-semibold mb-2">{config.title ?? "Temas em destaque"}</h2>
@@ -107,6 +108,7 @@ async function ArticleListSection({ config }: { config: CmsSectionConfig<"articl
     ? (await getAllArticles()).filter((a) => a.category === config.categorySlug)
     : await getAllArticles();
   const items = articles.slice(0, config.limit ?? 6);
+  if (items.length === 0) return null;
   return (
     <section className="bg-muted/50 py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
