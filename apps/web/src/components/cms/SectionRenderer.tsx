@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { CmsSection, CmsSectionConfig } from "@khoros/shared";
 import { ArticleCard } from "@/components/marketing/ArticleCard";
@@ -21,14 +22,36 @@ interface SectionRendererProps {
 type CtaButton = CmsSectionConfig<"hero">["ctas"][number];
 
 function buttonClass(variant: CtaButton["variant"] = "primary"): string {
-  if (variant === "secondary") {
-    return "inline-flex justify-center px-8 py-3 border-2 border-khoros-cyan text-khoros-cyan-dark font-medium rounded-full hover:bg-khoros-mint transition-colors";
-  }
-  if (variant === "link") {
-    return "text-khoros-cyan-dark font-medium hover:underline";
-  }
-  return "inline-flex justify-center px-8 py-3 bg-khoros-cyan text-white font-medium rounded-full hover:bg-khoros-cyan-dark transition-colors";
+  if (variant === "secondary") return "btn-secondary";
+  if (variant === "link") return "font-semibold text-brand-700 hover:text-brand-800 underline-offset-4 hover:underline";
+  return "btn-primary";
 }
+
+function SectionHeading({
+  eyebrow,
+  title,
+  text,
+  center = false,
+}: {
+  eyebrow?: string;
+  title: string;
+  text?: string;
+  center?: boolean;
+}) {
+  return (
+    <div className={`mb-10 max-w-2xl ${center ? "text-center mx-auto" : ""}`}>
+      {eyebrow && <p className="eyebrow mb-3">{eyebrow}</p>}
+      <h2 className="text-3xl sm:text-[2.1rem] font-semibold text-calm-900 leading-tight">{title}</h2>
+      {text && <p className="mt-3 text-calm-600 text-lg leading-relaxed">{text}</p>}
+    </div>
+  );
+}
+
+const HERO_POINTS = [
+  "Conteúdo baseado em evidências",
+  "Acolhimento sem julgamento",
+  "Privacidade e sigilo (LGPD)",
+];
 
 // Onda 0: CTAs de cadastro (Sou paciente / Sou psicólogo) removidos do marketing.
 // Para relançar: restaurar links em Header.tsx + reativar expansão de /cadastro aqui.
@@ -36,30 +59,58 @@ function buttonClass(variant: CtaButton["variant"] = "primary"): string {
 function HeroSection({ config }: { config: CmsSectionConfig<"hero"> }) {
   const ctas = config.ctas ?? [];
   return (
-    <section className="bg-gradient-to-b from-khoros-mint/60 to-background">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-center">
-        {config.eyebrow && (
-          <p className="text-khoros-cyan-dark font-medium mb-4 tracking-wide uppercase text-sm">
-            {config.eyebrow}
-          </p>
-        )}
-        <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-6 font-serif leading-tight max-w-3xl mx-auto">
-          {config.title}
-        </h1>
-        {config.subtitle && (
-          <p className="text-lg text-khoros-slate max-w-2xl mx-auto mb-8 leading-relaxed">
-            {config.subtitle}
-          </p>
-        )}
-        {ctas.length > 0 && (
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {ctas.map((cta) => (
-              <Link key={`${cta.href}-${cta.label}`} href={cta.href} className={buttonClass(cta.variant)}>
-                {cta.label}
-              </Link>
+    <section className="atmosphere-hero relative overflow-hidden -mt-[72px] pt-[72px]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-24 grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="animate-rise-in">
+          {config.eyebrow && (
+            <p className="eyebrow mb-5">
+              <span className="h-px w-6 bg-brand-400" aria-hidden />
+              {config.eyebrow}
+            </p>
+          )}
+          <h1 className="text-[2.4rem] leading-[1.1] sm:text-5xl lg:text-[3.4rem] font-semibold text-calm-900">
+            {config.title}
+          </h1>
+          {config.subtitle && (
+            <p className="mt-6 text-lg text-calm-600 max-w-xl leading-relaxed">{config.subtitle}</p>
+          )}
+          {ctas.length > 0 && (
+            <div className="mt-9 flex flex-col sm:flex-row gap-3">
+              {ctas.map((cta) => (
+                <Link key={`${cta.href}-${cta.label}`} href={cta.href} className={buttonClass(cta.variant)}>
+                  {cta.label}
+                </Link>
+              ))}
+            </div>
+          )}
+          <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm text-calm-600">
+            {HERO_POINTS.map((point) => (
+              <li key={point} className="flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-brand-500" aria-hidden>
+                  <path d="M5 12l5 5L20 7" />
+                </svg>
+                {point}
+              </li>
             ))}
+          </ul>
+        </div>
+
+        <div className="relative hidden lg:block" aria-hidden>
+          <div className="absolute -inset-6 rounded-[2.5rem] bg-brand-100/60 rotate-3" />
+          <div className="relative rounded-[2rem] bg-gradient-to-br from-brand-500 to-brand-700 p-12 shadow-[var(--shadow-lift)]">
+            <Image
+              src="/brand/butterfly-white.png"
+              alt=""
+              width={800}
+              height={560}
+              priority
+              className="w-full h-auto opacity-95 animate-drift-slow"
+            />
+            <p className="mt-8 text-center font-display text-white/90 text-lg tracking-wide">
+              cuidado · escuta · confiança
+            </p>
           </div>
-        )}
+        </div>
       </div>
     </section>
   );
@@ -72,31 +123,32 @@ async function CategoryGridSection({ config }: { config: CmsSectionConfig<"categ
   const featured = visibleCategories.slice(0, config.limit ?? 6);
   if (featured.length === 0) return null;
   return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-      <h2 className="text-2xl font-semibold mb-2">{config.title ?? "Temas em destaque"}</h2>
-      <p className="text-khoros-slate mb-8">
-        Conteúdo organizado por assunto para facilitar sua busca.
-      </p>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-20">
+      <SectionHeading
+        eyebrow="Explore por tema"
+        title={config.title ?? "Temas em destaque"}
+        text="Conteúdo organizado por assunto para facilitar sua busca."
+      />
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {featured.map((cat) => (
           <Link
             key={cat.slug}
             href={`/blog/categoria/${cat.slug}`}
-            className="bg-card border border-border rounded-2xl overflow-hidden hover:border-khoros-cyan/40 hover:shadow-sm transition-all group"
+            className="group bg-white rounded-[var(--radius-card)] overflow-hidden ring-1 ring-calm-200 hover:ring-brand-200 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-lift)] hover:-translate-y-0.5 transition-all duration-300"
           >
             <CategoryImage src={cat.image} alt={cat.imageAlt} variant="card" />
             <div className="p-5">
-              <h3 className="font-semibold group-hover:text-khoros-cyan-dark transition-colors">
+              <h3 className="font-semibold text-calm-900 group-hover:text-brand-700 transition-colors">
                 {cat.name}
               </h3>
-              <p className="text-sm text-khoros-slate mt-1 line-clamp-2">{cat.description}</p>
+              <p className="text-sm text-calm-600 mt-1 line-clamp-2">{cat.description}</p>
             </div>
           </Link>
         ))}
       </div>
       <div className="text-center mt-8">
-        <Link href="/blog" className="text-khoros-cyan-dark font-medium hover:underline">
-          Ver todos os temas →
+        <Link href="/blog" className="btn-secondary">
+          Ver todos os temas
         </Link>
       </div>
     </section>
@@ -110,12 +162,13 @@ async function ArticleListSection({ config }: { config: CmsSectionConfig<"articl
   const items = articles.slice(0, config.limit ?? 6);
   if (items.length === 0) return null;
   return (
-    <section className="bg-muted/50 py-16">
+    <section className="bg-brand-50/70 py-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <h2 className="text-2xl font-semibold mb-2">{config.title ?? "Artigos recentes"}</h2>
-        <p className="text-khoros-slate mb-8">
-          Leituras acolhedoras, baseadas em evidências e revisadas por profissionais.
-        </p>
+        <SectionHeading
+          eyebrow="Leituras"
+          title={config.title ?? "Artigos recentes"}
+          text="Leituras acolhedoras e baseadas em evidências."
+        />
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((article) => (
             <ArticleCard key={`${article.category}-${article.slug}`} article={article} />
@@ -137,15 +190,33 @@ function RichTextSection({ config }: { config: CmsSectionConfig<"rich_text"> }) 
 function CtaBandSection({ config }: { config: CmsSectionConfig<"cta_band"> }) {
   const buttons = config.buttons;
   return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16 text-center">
-      <div className="bg-khoros-warm border border-border rounded-3xl p-8 sm:p-12">
-        <h2 className="text-2xl font-semibold mb-4">{config.title}</h2>
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
+      <div className="relative overflow-hidden rounded-[2rem] bg-brand-800 px-6 py-14 sm:px-14 text-center">
+        <Image
+          src="/brand/butterfly-white.png"
+          alt=""
+          aria-hidden
+          width={400}
+          height={280}
+          className="pointer-events-none absolute -right-10 -bottom-10 w-72 opacity-[0.08]"
+        />
+        <h2 className="relative text-3xl font-semibold text-white mb-4">{config.title}</h2>
         {config.text && (
-          <p className="text-khoros-slate max-w-xl mx-auto mb-6">{config.text}</p>
+          <p className="relative text-brand-100 max-w-xl mx-auto mb-8 text-lg">{config.text}</p>
         )}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+        <div className="relative flex flex-col sm:flex-row gap-3 justify-center">
           {buttons.map((btn) => (
-            <Link key={`${btn.href}-${btn.label}`} href={btn.href} className={buttonClass(btn.variant)}>
+            <Link
+              key={`${btn.href}-${btn.label}`}
+              href={btn.href}
+              className={
+                btn.variant === "secondary"
+                  ? "btn-secondary !bg-transparent !text-white !border-white/30 hover:!bg-white/10"
+                  : btn.variant === "link"
+                    ? "font-semibold text-white underline-offset-4 hover:underline"
+                    : "btn-primary !bg-white !text-brand-800 hover:!bg-brand-50"
+              }
+            >
               {btn.label}
             </Link>
           ))}
@@ -157,8 +228,8 @@ function CtaBandSection({ config }: { config: CmsSectionConfig<"cta_band"> }) {
 
 function FaqSection({ config }: { config: CmsSectionConfig<"faq"> }) {
   return (
-    <section className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      {config.title && <h2 className="text-xl font-semibold mb-4">{config.title}</h2>}
+    <section className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+      {config.title && <h2 className="text-2xl font-semibold text-calm-900 mb-6">{config.title}</h2>}
       <FAQAccordion items={config.items} id={config.title ? `faq-${config.title}` : undefined} />
     </section>
   );
@@ -166,24 +237,24 @@ function FaqSection({ config }: { config: CmsSectionConfig<"faq"> }) {
 
 function StepsSection({ config }: { config: CmsSectionConfig<"steps"> }) {
   return (
-    <section className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      {config.title && <h2 className="text-2xl font-semibold mb-6 text-center">{config.title}</h2>}
-      <div className="space-y-6">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 py-16">
+      {config.title && <SectionHeading eyebrow="Passo a passo" title={config.title} center />}
+      <ol className="grid gap-5 md:grid-cols-2">
         {config.items.map((step, i) => (
-          <div
+          <li
             key={`${step.title}-${i}`}
-            className="flex flex-col sm:flex-row gap-4 p-6 bg-card border border-border rounded-2xl"
+            className="relative flex gap-5 p-6 sm:p-7 bg-white rounded-[var(--radius-card)] ring-1 ring-calm-200 shadow-[var(--shadow-soft)]"
           >
-            <div className="sm:w-10 shrink-0 text-khoros-cyan-dark font-serif text-2xl font-bold">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-100 font-display text-lg font-semibold text-brand-700">
               {i + 1}
-            </div>
+            </span>
             <div>
-              <h3 className="font-semibold text-lg mb-1">{step.title}</h3>
-              <p className="text-khoros-slate">{step.text}</p>
+              <h3 className="font-semibold text-lg text-calm-900 mb-1.5">{step.title}</h3>
+              <p className="text-calm-600 leading-relaxed">{step.text}</p>
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </section>
   );
 }
@@ -191,9 +262,9 @@ function StepsSection({ config }: { config: CmsSectionConfig<"steps"> }) {
 function CrisisBannerSection({ config }: { config: CmsSectionConfig<"crisis_banner"> }) {
   return (
     <section className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
-      <div role="alert" className="bg-amber-50 border border-amber-200 rounded-xl p-4 sm:p-5">
-        <p className="font-semibold text-amber-900 mb-2">{config.title}</p>
-        <p className="text-sm text-amber-800 mb-3">{config.text}</p>
+      <div role="alert" className="bg-sand-50 ring-1 ring-sand-100 rounded-2xl p-5 sm:p-6">
+        <p className="font-semibold text-calm-900 mb-2">{config.title}</p>
+        <p className="text-sm text-calm-700 mb-3">{config.text}</p>
         <CrisisResources variant="inline" />
       </div>
     </section>
@@ -204,11 +275,20 @@ function ValidationBlockSection({ config }: { config: CmsSectionConfig<"validati
   return (
     <section
       id="lista-espera"
-      className="max-w-3xl mx-auto px-4 sm:px-6 py-8"
+      className="max-w-3xl mx-auto px-4 sm:px-6 py-12 scroll-mt-24"
     >
-      <div className="bg-khoros-warm border border-border rounded-3xl p-8 text-center">
-        <h2 className="text-2xl font-semibold mb-3">{config.title}</h2>
-        <p className="text-khoros-slate mb-6 max-w-md mx-auto">{config.text}</p>
+      <div className="relative overflow-hidden bg-white ring-1 ring-brand-100 shadow-[var(--shadow-lift)] rounded-[2rem] p-8 sm:p-12 text-center">
+        <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-brand-300 via-brand-500 to-brand-300" aria-hidden />
+        <Image
+          src="/brand/butterfly-green.png"
+          alt=""
+          aria-hidden
+          width={120}
+          height={84}
+          className="mx-auto mb-5 h-12 w-auto opacity-80"
+        />
+        <h2 className="text-3xl font-semibold text-calm-900 mb-3">{config.title}</h2>
+        <p className="text-calm-600 mb-8 max-w-md mx-auto text-lg">{config.text}</p>
         {config.formId === "waitlist" ? (
           <WaitlistForm />
         ) : config.cta ? (
@@ -223,9 +303,9 @@ function ValidationBlockSection({ config }: { config: CmsSectionConfig<"validati
 
 function DisclaimerSection({ config }: { config: CmsSectionConfig<"disclaimer"> }) {
   return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16 text-center">
-      {config.title && <h2 className="text-lg font-semibold mb-2">{config.title}</h2>}
-      <p className="text-xs text-khoros-slate italic max-w-2xl mx-auto">{config.text}</p>
+    <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-14 pt-4 text-center">
+      {config.title && <h2 className="text-base font-semibold text-calm-800 mb-2">{config.title}</h2>}
+      <p className="text-xs text-calm-500 italic max-w-2xl mx-auto leading-relaxed">{config.text}</p>
     </section>
   );
 }

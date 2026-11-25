@@ -70,9 +70,9 @@ function VideoPlaceholder({
   hint?: string;
 }) {
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1a222c] px-6 text-center">
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1c2620] px-6 text-center">
       <span
-        className="flex h-20 w-20 items-center justify-center rounded-full bg-[#2a3542] text-2xl font-semibold tracking-wide text-white/90 sm:h-24 sm:w-24 sm:text-3xl"
+        className="flex h-20 w-20 items-center justify-center rounded-full bg-[#2c3a31] text-2xl font-semibold tracking-wide text-white/90 sm:h-24 sm:w-24 sm:text-3xl"
         aria-hidden
       >
         {initials}
@@ -135,12 +135,24 @@ export function SessionMediaStage({
   const showLocalMainPlaceholder = showLocalPlaceholder || !connected;
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col bg-[#0f1419]">
+    <div className="relative flex min-h-0 flex-1 flex-col bg-[#121a15]">
       {/* Barra superior: status + cronômetro/custo */}
       <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-2 px-3 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-5">
-        <span className="rounded-full bg-black/50 px-3 py-1 text-xs text-white/90 backdrop-blur">
-          {statusLabel}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="rounded-full bg-black/50 px-3 py-1 text-xs text-white/90 backdrop-blur">
+            {statusLabel}
+          </span>
+          <span
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-full bg-brand-500/25 px-3 py-1 text-xs text-brand-100 ring-1 ring-brand-300/30 backdrop-blur"
+            title="Somente você e o(a) profissional estão nesta sala. A consulta não é gravada."
+          >
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
+              <rect x="4" y="11" width="16" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+            Sala privada · não gravada
+          </span>
+        </div>
         <span className="rounded-full bg-black/50 px-3 py-1 text-xs text-white/90 backdrop-blur">
           {formatDuration(paidSeconds)} · {formatBRL(accruedCents)}
         </span>
@@ -148,7 +160,7 @@ export function SessionMediaStage({
 
       {/* Área do tile — usa o espaço útil sem crescer indefinidamente em telas grandes */}
       <div className="flex min-h-0 flex-1 items-center justify-center px-3 pb-2 pt-14 sm:px-6 sm:pb-3 sm:pt-16">
-        <div className="relative aspect-[9/16] w-full max-w-[min(100%,calc((100dvh-8rem)*9/16))] overflow-hidden rounded-2xl bg-[#1a222c] shadow-2xl shadow-black/40 sm:aspect-video sm:max-w-[min(80rem,calc((100dvh-8.5rem)*16/9))]">
+        <div className="relative aspect-[9/16] w-full max-w-[min(100%,calc((100dvh-8rem)*9/16))] overflow-hidden rounded-2xl bg-[#1c2620] shadow-2xl shadow-black/40 sm:aspect-video sm:max-w-[min(80rem,calc((100dvh-8.5rem)*16/9))]">
           {/* Tile principal: remoto se presente, senão local */}
           {localIsMain ? (
             <>
@@ -192,7 +204,7 @@ export function SessionMediaStage({
                   className={`h-full w-full object-cover ${showLocalPlaceholder ? "hidden" : ""}`}
                 />
                 {showLocalPlaceholder && (
-                  <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-[#2a3542] text-white/80">
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-1 bg-[#2c3a31] text-white/80">
                     <CameraOffIcon className="h-5 w-5" />
                     <span className="px-1 text-center text-[0.6rem] leading-tight">
                       {mediaError ? "Sem permissão" : "Câmera off"}

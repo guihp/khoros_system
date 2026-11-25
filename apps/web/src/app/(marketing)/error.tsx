@@ -22,10 +22,10 @@ export default function MarketingError({
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-16">
-      <h1 className="text-2xl sm:text-3xl font-bold font-serif mb-3">
+      <h1 className="text-2xl sm:text-3xl font-semibold text-calm-900 mb-3">
         Conteúdo temporariamente indisponível
       </h1>
-      <p className="text-khoros-slate mb-8">
+      <p className="text-calm-600 mb-8">
         Não conseguimos carregar esta página agora. Já estamos verificando — tente
         novamente em alguns instantes.
       </p>
@@ -34,7 +34,7 @@ export default function MarketingError({
         <button
           type="button"
           onClick={reset}
-          className="rounded-lg bg-khoros-cyan-dark px-4 py-2 text-sm font-medium text-white"
+          className="rounded-lg bg-brand-700 px-4 py-2 text-sm font-medium text-white"
         >
           Tentar novamente
         </button>

@@ -61,24 +61,22 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         ]}
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-        <nav className="text-sm text-khoros-slate mb-6">
-          <Link href="/blog" className="hover:text-khoros-cyan-dark">Blog</Link>
-          <span className="mx-2">/</span>
-          <span>{category.name}</span>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-8 pb-20">
+        <nav className="text-sm text-calm-500 mb-8" aria-label="Trilha">
+          <Link href="/blog" className="hover:text-brand-700">Blog</Link>
+          <span className="mx-2" aria-hidden>/</span>
+          <span className="text-calm-800">{category.name}</span>
         </nav>
 
-        <header className="mb-10">
-          <CategoryImage
-            src={category.image}
-            alt={category.imageAlt}
-            variant="hero"
-            priority
-          />
-          <h1 className="text-3xl sm:text-4xl font-bold font-serif mb-3">
-            {category.name}
-          </h1>
-          <p className="text-khoros-slate text-lg max-w-2xl">{category.description}</p>
+        <header className="mb-12 grid gap-8 lg:grid-cols-2 items-center">
+          <div>
+            <p className="eyebrow mb-3">Tema</p>
+            <h1 className="text-4xl sm:text-5xl font-semibold text-calm-900 leading-[1.1] mb-4">
+              {category.name}
+            </h1>
+            <p className="text-calm-600 text-lg leading-relaxed max-w-xl">{category.description}</p>
+          </div>
+          <CategoryImage src={category.image} alt={category.imageAlt} variant="hero" priority />
         </header>
 
         {articles.length > 0 ? (
@@ -88,12 +86,12 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
             ))}
           </div>
         ) : (
-          <p className="text-khoros-slate mb-16">Em breve, novos artigos nesta categoria.</p>
+          <div className="mb-16 rounded-[var(--radius-card)] bg-white ring-1 ring-calm-200 px-6 py-12 text-center text-calm-600">Em breve, novos artigos neste tema.</div>
         )}
 
         {faqs.length > 0 && (
           <section>
-            <h2 className="text-2xl font-semibold mb-6">Perguntas frequentes sobre {category.name.toLowerCase()}</h2>
+            <h2 className="text-2xl font-semibold text-calm-900 mb-6">Perguntas frequentes sobre {category.name.toLowerCase()}</h2>
             <FAQAccordion items={faqs} />
           </section>
         )}

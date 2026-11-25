@@ -14,7 +14,7 @@ export function WaitlistForm() {
           trackEvent({ event: "lead_form_open", source: "waitlist" });
           setShowModal(true);
         }}
-        className="inline-flex items-center gap-2 px-6 py-3 bg-khoros-cyan text-white font-medium rounded-full hover:bg-khoros-cyan-dark transition-colors"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-brand-600 text-white font-medium rounded-full hover:bg-brand-700 transition-colors"
       >
         Quero ser avisado(a)
       </button>

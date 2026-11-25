@@ -329,12 +329,14 @@ export function useSessionRoom(sessionId: string, options: UseSessionRoomOptions
 
         const livekitUrl = stored?.livekitUrl ?? detail.livekitUrl;
         const hbSecret = stored?.hbSecret ?? detail.hbSecret;
+        // Token novo do servidor primeiro (curta duração); o salvo no
+        // sessionStorage só serve de fallback logo após iniciar/aceitar.
         const livekitToken =
-          stored?.patientToken ??
-          stored?.psychologistToken ??
+          detail.livekitToken ??
           detail.patientToken ??
           detail.psychologistToken ??
-          detail.livekitToken;
+          stored?.patientToken ??
+          stored?.psychologistToken;
 
         if (!livekitToken || !livekitUrl || !hbSecret) {
           throw new Error("Sessão sem credenciais de vídeo. Tente novamente em alguns segundos.");

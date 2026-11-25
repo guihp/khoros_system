@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { fetchApi, ApiError } from "@/lib/api";
 import { writePendingRegistration } from "@/lib/pending-registration";
 import { postRegisterRedirectPath, roleHomePath } from "@/lib/complete-registration";
+import { AuthLayout } from "@/components/AuthLayout";
 
 // ADMIN é cadastro via BOOTSTRAP_ADMIN_EMAIL (ver auth/routes.ts) — sem UI própria aqui.
 type Role = "PATIENT" | "PSYCHOLOGIST";
@@ -137,8 +138,7 @@ function CadastroForm() {
   }
 
   return (
-    <main className="mx-auto max-w-sm px-4 py-16">
-      <h1 className="text-2xl font-semibold text-calm-900">Criar conta</h1>
+    <AuthLayout title="Criar conta">
       {alreadyLoggedIn ? (
         <p className="mt-2 text-sm text-calm-600">
           Sua conta já existe — falta só completar seu perfil na KHOROS.
@@ -329,7 +329,7 @@ function CadastroForm() {
           </Link>
         </p>
       )}
-    </main>
+    </AuthLayout>
   );
 }
 

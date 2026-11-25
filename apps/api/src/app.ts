@@ -1,5 +1,5 @@
 import { readFileSync } from "node:fs";
-import Fastify, { type FastifyInstance } from "fastify";
+import Fastify, { type FastifyInstance, type FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import multipart from "@fastify/multipart";
 import rateLimit from "@fastify/rate-limit";
@@ -65,6 +65,17 @@ export async function buildApp(env: Env): Promise<FastifyInstance> {
     level: env.NODE_ENV === "production" ? "info" : ("debug" as const),
     // Nunca logar conteúdo clínico nem dados sensíveis.
     redact: ["req.headers.authorization", "*.cpf", "*.conteudo"],
+    // O WS de sessão recebe o JWT em ?token= — nunca gravar na URL do log.
+    serializers: {
+      req(req: FastifyRequest) {
+        return {
+          method: req.method,
+          url: req.url.replace(/([?&](?:token|access_token)=)[^&]+/gi, "$1[redacted]"),
+          hostname: req.hostname,
+          remoteAddress: req.ip,
+        };
+      },
+    },
   };
 
   // Overloads do Fastify diferenciam http/https pelo tipo do server — dois
@@ -100,6 +111,17 @@ export async function buildApp(env: Env): Promise<FastifyInstance> {
     limits: { fileSize: 5 * 1024 * 1024, files: 1 },
   });
   await app.register(rateLimit, { max: 120, timeWindow: "1 minute" });
+
+  // Cabeçalhos de segurança básicos (API só serve JSON/WS).
+  app.addHook("onSend", async (_req, reply, payload) => {
+    reply.header("X-Content-Type-Options", "nosniff");
+    reply.header("X-Frame-Options", "DENY");
+    reply.header("Referrer-Policy", "no-referrer");
+    if (env.NODE_ENV === "production") {
+      reply.header("Strict-Transport-Security", "max-age=63072000; includeSubDomains");
+    }
+    return payload;
+  });
   await app.register(websocket);
 
   // Corpo bruto exigido pela verificação de assinatura do webhook LiveKit.

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createSupabaseAdmin } from "@/lib/blog/supabase";
+import { clientIp, rateLimit } from "@/lib/server/rate-limit";
 
 const leadSchema = z.object({
-  name: z.string().min(2, "Nome muito curto"),
-  email: z.string().email("E-mail inválido"),
+  name: z.string().trim().min(2, "Nome muito curto").max(120),
+  email: z.string().trim().max(254).email("E-mail inválido"),
   phone: z
     .string()
     .min(1, "Celular obrigatório")
@@ -13,15 +14,18 @@ const leadSchema = z.object({
       message: "Celular inválido. Use o formato (XX) 9 XXXX-XXXX.",
     }),
   /** Legado — plataforma é online; cidade não é mais coletada no formulário. */
-  city: z.string().min(2).optional(),
+  city: z.string().min(2).max(80).optional(),
   consent: z.literal(true, { errorMap: () => ({ message: "Consentimento obrigatório" }) }),
-  article_slug: z.string().optional(),
-  article_category: z.string().optional(),
-  article_title: z.string().optional(),
-  source: z.string().optional(),
+  article_slug: z.string().max(200).optional(),
+  article_category: z.string().max(200).optional(),
+  article_title: z.string().max(300).optional(),
+  source: z.string().max(60).optional(),
 });
 
 export async function POST(request: Request) {
+  if (!rateLimit(`lead:${clientIp(request)}`, 5, 10 * 60_000)) {
+    return NextResponse.json({ error: "Muitas tentativas. Tente novamente em alguns minutos." }, { status: 429 });
+  }
   try {
     const body = await request.json();
     const data = leadSchema.parse(body);

@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { fetchApi } from "@/lib/api";
 import { roleHomePath } from "@/lib/complete-registration";
 import type { MeResponse } from "@/lib/api-types";
+import { AuthLayout } from "@/components/AuthLayout";
 
 export default function EntrarPage() {
   const { signIn, refresh } = useAuth();
@@ -56,13 +57,8 @@ export default function EntrarPage() {
   }
 
   return (
-    <main className="mx-auto max-w-sm px-4 py-16">
-      <h1 className="text-2xl font-semibold text-calm-900">Entrar</h1>
-      <p className="mt-2 text-sm text-calm-600">
-        Acesse sua conta para continuar sua conversa.
-      </p>
-
-      <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+    <AuthLayout title="Entrar" subtitle="Acesse sua conta para continuar.">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-1.5">
           <span className="text-sm font-medium text-calm-800">E-mail</span>
           <input
@@ -108,6 +104,6 @@ export default function EntrarPage() {
           Criar conta
         </Link>
       </p>
-    </main>
+    </AuthLayout>
   );
 }

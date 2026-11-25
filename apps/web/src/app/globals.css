@@ -2,55 +2,65 @@
 
 /*
  * Design tokens KHOROS — acolhedor, calmo, confiável.
- * Base clara e arejada; azuis/verdes suaves com o ciano KHOROS como acento.
- * Contraste mínimo WCAG AA em todos os pares texto/fundo.
+ * Paleta derivada da logo (verde sálvia #859784). Base clara e quente,
+ * verde como cor de marca, areia como acento acolhedor.
+ * Contraste mínimo WCAG AA em todos os pares texto/fundo:
+ *   brand-600+ e calm-600+ passam AA sobre branco/calm-50.
  */
 @theme {
-  /* Acento — ciano KHOROS */
-  --color-brand-50: #ecfeff;
-  --color-brand-100: #cffafe;
-  --color-brand-200: #a5f3fc;
-  --color-brand-400: #22d3ee;
-  --color-brand-600: #0891b2; /* AA sobre branco */
-  --color-brand-700: #0e7490;
-  --color-brand-800: #155e75;
+  /* Marca — verde sálvia da logo */
+  --color-brand-50: #f2f6f1;
+  --color-brand-100: #e3ebe2;
+  --color-brand-200: #c9d8c8;
+  --color-brand-300: #a8bea8;
+  --color-brand-400: #859784; /* cor exata da logo */
+  --color-brand-500: #6a8a6c;
+  --color-brand-600: #557358; /* AA sobre branco (5.4:1) */
+  --color-brand-700: #445e47;
+  --color-brand-800: #364b39;
+  --color-brand-900: #27372a;
 
-  /* Neutros mornos, sem frieza de fintech */
-  --color-calm-50: #f8fafa;
-  --color-calm-100: #f1f5f5;
-  --color-calm-200: #e2eaea;
-  --color-calm-400: #94a8a8;
-  --color-calm-600: #4d6363;
-  --color-calm-800: #253434;
-  --color-calm-900: #162222;
+  /* Neutros com leve fundo esverdeado — calmos, nunca frios */
+  --color-calm-50: #f7f8f5;
+  --color-calm-100: #eff2ec;
+  --color-calm-200: #e2e7de;
+  --color-calm-300: #ccd4c8;
+  --color-calm-400: #9ba69a;
+  --color-calm-500: #78837a;
+  --color-calm-600: #59645b;
+  --color-calm-700: #444e46;
+  --color-calm-800: #2d352f;
+  --color-calm-900: #1d231f;
 
-  /* Verde suave — estados positivos, disponibilidade */
-  --color-sage-100: #e7f2ec;
-  --color-sage-600: #2e7d5b;
+  /* Verde de estado — disponível/sucesso (mais saturado que a marca) */
+  --color-sage-100: #e3f0e3;
+  --color-sage-500: #4f8a55;
+  --color-sage-600: #3a7042;
+
+  /* Areia — acento acolhedor para blocos de destaque */
+  --color-sand-50: #faf6ef;
+  --color-sand-100: #f3ebdd;
+  --color-sand-600: #8a6a3d;
 
   /* Sinalização discreta (saldo, avisos) — nunca alarmista */
   --color-warn-100: #fdf3e0;
   --color-warn-700: #8a5a12;
 
-  /* Tokens do blog (marketing) — alinhados ao site Onda 0 */
-  --color-background: #f8fafb;
-  --color-foreground: #1e293b;
-  --color-khoros-cyan: #00e5ff;
-  --color-khoros-cyan-dark: #00b4d8;
-  --color-khoros-teal: #48cae4;
-  --color-khoros-mint: #e8f8f5;
-  --color-khoros-sage: #d4edda;
-  --color-khoros-slate: #64748b;
-  --color-khoros-warm: #fef9f3;
+  /* Aliases semânticos (blog/marketing) */
+  --color-background: #f7f8f5;
+  --color-foreground: #1d231f;
   --color-card: #ffffff;
-  --color-border: #e2e8f0;
-  --color-muted: #f1f5f9;
+  --color-border: #e2e7de;
+  --color-muted: #eff2ec;
 
   --font-sans: var(--font-body, ui-sans-serif), system-ui, -apple-system, sans-serif;
-  --font-display: var(--font-display, "Fraunces", ui-serif), Georgia, serif;
-  --font-serif: var(--font-source-serif, "Source Serif 4", ui-serif), Georgia, serif;
+  --font-display: var(--font-heading, ui-sans-serif), system-ui, sans-serif;
+  --font-serif: var(--font-reading, ui-serif), Georgia, serif;
 
-  --radius-card: 1rem;
+  --radius-card: 1.25rem;
+
+  --shadow-soft: 0 1px 2px rgb(29 35 31 / 0.04), 0 8px 24px -12px rgb(39 55 42 / 0.18);
+  --shadow-lift: 0 2px 4px rgb(29 35 31 / 0.05), 0 18px 40px -18px rgb(39 55 42 / 0.28);
 }
 
 html {
@@ -63,18 +73,56 @@ body {
   font-family: var(--font-sans);
 }
 
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.015em;
+}
+
+::selection {
+  background: var(--color-brand-200);
+  color: var(--color-brand-900);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand-500);
+  outline-offset: 2px;
+}
+
+/* Botões padrão da marca — usados no site e no app */
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem; border-radius: 9999px;
+  background: var(--color-brand-600); color: #fff; font-weight: 600; font-size: 0.95rem;
+  transition: background-color .2s, transform .2s, box-shadow .2s;
+  box-shadow: 0 6px 18px -8px rgb(68 94 71 / 0.6);
+}
+.btn-primary:hover { background: var(--color-brand-700); transform: translateY(-1px); }
+.btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.75rem 1.5rem; border-radius: 9999px;
+  background: #fff; color: var(--color-brand-700); font-weight: 600; font-size: 0.95rem;
+  border: 1px solid var(--color-brand-200);
+  transition: background-color .2s, border-color .2s;
+}
+.btn-secondary:hover { background: var(--color-brand-50); border-color: var(--color-brand-300); }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: .75rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--color-brand-600);
+}
+
 /* Atmosfera calma para composições full-bleed — nunca flat, nunca fintech. */
 .atmosphere-hero {
   background-image:
-    radial-gradient(60% 55% at 18% 8%, color-mix(in srgb, var(--color-brand-100) 70%, transparent) 0%, transparent 65%),
-    radial-gradient(55% 50% at 90% 12%, color-mix(in srgb, var(--color-sage-100) 65%, transparent) 0%, transparent 70%),
+    radial-gradient(60% 55% at 12% 0%, color-mix(in srgb, var(--color-brand-100) 85%, transparent) 0%, transparent 65%),
+    radial-gradient(50% 50% at 95% 10%, color-mix(in srgb, var(--color-sand-100) 80%, transparent) 0%, transparent 70%),
     linear-gradient(180deg, var(--color-calm-50) 0%, #ffffff 55%, var(--color-calm-50) 100%);
 }
 
 .atmosphere-panel {
   background-image:
     radial-gradient(45% 65% at 50% 0%, color-mix(in srgb, var(--color-brand-100) 55%, transparent) 0%, transparent 70%),
-    linear-gradient(160deg, var(--color-sage-100) 0%, var(--color-brand-50) 55%, var(--color-calm-50) 100%);
+    linear-gradient(160deg, var(--color-brand-100) 0%, var(--color-brand-50) 55%, var(--color-sand-50) 100%);
 }
 
 @keyframes drift-slow {

@@ -96,36 +96,30 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         ]}
       />
 
-      <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+      <article className="max-w-3xl mx-auto px-4 sm:px-6 pt-8 pb-20">
         {article.sensitive && (
           <div className="mb-8">
             <CrisisResources variant="banner" />
           </div>
         )}
 
-        <nav className="text-sm text-khoros-slate mb-6">
-          <Link href="/blog" className="hover:text-khoros-cyan-dark">Blog</Link>
-          <span className="mx-2">/</span>
-          <Link href={`/blog/categoria/${category}`} className="hover:text-khoros-cyan-dark">
+        <nav className="text-sm text-calm-500 mb-8" aria-label="Trilha">
+          <Link href="/blog" className="hover:text-brand-700">Blog</Link>
+          <span className="mx-2" aria-hidden>/</span>
+          <Link href={`/blog/categoria/${category}`} className="hover:text-brand-700">
             {categoryName}
           </Link>
         </nav>
 
-        {(article.image || categoryData?.image) && (
-          <CategoryImage
-            src={article.image || categoryData!.image}
-            alt={article.imageAlt || categoryData!.imageAlt}
-            variant="hero"
-            priority
-          />
-        )}
-
-        <header className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-bold font-serif leading-tight mb-4">
+        <header className="mb-10">
+          <span className="inline-block rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-brand-700 mb-5">
+            {categoryName}
+          </span>
+          <h1 className="text-[2.1rem] sm:text-5xl font-semibold text-calm-900 leading-[1.12] mb-5">
             {article.title}
           </h1>
-          <p className="text-lg text-khoros-slate mb-4">{article.description}</p>
-          <div className="flex flex-wrap gap-4 text-sm text-khoros-slate">
+          <p className="text-xl text-calm-600 leading-relaxed mb-6">{article.description}</p>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-calm-500 pb-8 border-b border-calm-200">
             <time dateTime={article.publishedAt}>
               {format(new Date(article.publishedAt), "d 'de' MMMM 'de' yyyy", { locale: ptBR })}
             </time>
@@ -143,16 +137,27 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </header>
 
+        {(article.image || categoryData?.image) && (
+          <CategoryImage
+            src={article.image || categoryData!.image}
+            alt={article.imageAlt || categoryData!.imageAlt}
+            variant="hero"
+            className="mb-10"
+            priority
+          />
+        )}
+
+
         <ContentDisclaimer />
 
-        <div className="mt-8">
-          <MDXContent source={article.content} />
+        <div className="mt-10">
+          <MDXContent source={article.content} variant="article" />
         </div>
 
         {article.sources && article.sources.length > 0 && (
           <section className="mt-10 pt-8 border-t border-border">
-            <h2 className="text-lg font-semibold mb-3">Fontes e referências</h2>
-            <ul className="text-sm text-khoros-slate space-y-1">
+            <h2 className="text-base font-semibold text-calm-900 mb-3">Fontes e referências</h2>
+            <ul className="text-sm text-calm-600 space-y-1">
               {article.sources.map((source, i) => (
                 <li key={i}>{source}</li>
               ))}
@@ -162,7 +167,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         {faqs.length > 0 && (
           <section className="mt-12">
-            <h2 className="text-2xl font-semibold mb-6">Perguntas frequentes</h2>
+            <h2 className="text-2xl font-semibold text-calm-900 mb-6">Perguntas frequentes</h2>
             <FAQAccordion items={faqs} />
           </section>
         )}
@@ -176,8 +181,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <CrisisResources variant="inline" />
 
         {related.length > 0 && (
-          <section className="mt-16">
-            <h2 className="text-2xl font-semibold mb-6">Conteúdos relacionados</h2>
+          <section className="mt-20 pt-12 border-t border-calm-200">
+            <p className="eyebrow mb-2">Continue lendo</p>
+            <h2 className="text-2xl font-semibold text-calm-900 mb-8">Conteúdos relacionados</h2>
             <div className="grid sm:grid-cols-2 gap-6">
               {related.map((rel) => (
                 <ArticleCard key={`${rel.category}-${rel.slug}`} article={rel} />

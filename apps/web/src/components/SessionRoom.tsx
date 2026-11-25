@@ -81,14 +81,14 @@ function SessionPreJoinLobby({
   onCancel: () => void;
 }) {
   return (
-    <main className="flex min-h-dvh flex-col bg-[#0f1419] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
+    <main className="flex min-h-dvh flex-col bg-[#121a15] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))]">
       <div className="mx-auto flex w-full max-w-lg flex-1 flex-col justify-center">
         <p className="text-center text-xl font-semibold text-white">Pronto para entrar?</p>
         <p className="mt-2 text-center text-sm text-white/60">
           Escolha se sua câmera e microfone começam ligados. Você pode mudar a qualquer momento na consulta.
         </p>
 
-        <div className="relative mx-auto mt-6 aspect-video w-full max-w-md overflow-hidden rounded-2xl bg-[#1a222c]">
+        <div className="relative mx-auto mt-6 aspect-video w-full max-w-md overflow-hidden rounded-2xl bg-[#1c2620]">
           <video
             ref={localVideoRef}
             autoPlay
@@ -118,7 +118,7 @@ function SessionPreJoinLobby({
             aria-pressed={!micEnabled}
             aria-label={micEnabled ? "Mutar microfone" : "Ativar microfone"}
             className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
-              micEnabled ? "bg-white/15 text-white" : "bg-white text-[#0f1419]"
+              micEnabled ? "bg-white/15 text-white" : "bg-white text-[#121a15]"
             }`}
           >
             <MicIcon off={!micEnabled} />
@@ -129,7 +129,7 @@ function SessionPreJoinLobby({
             aria-pressed={!camEnabled}
             aria-label={camEnabled ? "Ocultar vídeo" : "Ativar vídeo"}
             className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
-              camEnabled ? "bg-white/15 text-white" : "bg-white text-[#0f1419]"
+              camEnabled ? "bg-white/15 text-white" : "bg-white text-[#121a15]"
             }`}
           >
             <CameraIcon off={!camEnabled} />
@@ -298,7 +298,7 @@ export function SessionRoom({
   }
 
   return (
-    <main className="h-dvh overflow-hidden bg-[#0f1419]">
+    <main className="h-dvh overflow-hidden bg-[#121a15]">
       <div className="mx-auto flex h-full w-full max-w-screen-2xl flex-col">
         <SessionMediaStage
           connected={room.connected}

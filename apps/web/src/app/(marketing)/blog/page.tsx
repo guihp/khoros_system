@@ -33,28 +33,46 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     : allArticles;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-      <header className="mb-10">
-        <h1 className="text-3xl sm:text-4xl font-bold font-serif mb-3">Blog</h1>
-        <p className="text-khoros-slate text-lg max-w-2xl">
-          Conteúdo sobre saúde mental para educar, acolher e ajudar você a tomar
-          decisões informadas sobre o seu bem-estar.
-        </p>
-      </header>
-
-      <Suspense fallback={<div className="h-10" />}>
-        <CategoryFilter categories={visibleCategories} />
-      </Suspense>
-
-      {articles.length === 0 ? (
-        <p className="text-khoros-slate">Nenhum artigo encontrado nesta categoria.</p>
-      ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {articles.map((article) => (
-            <ArticleCard key={`${article.category}-${article.slug}`} article={article} />
-          ))}
+    <div>
+      <section className="atmosphere-hero -mt-[72px] pt-[72px]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-10 sm:pt-20">
+          <p className="eyebrow mb-4">Blog KHOROS</p>
+          <h1 className="text-4xl sm:text-5xl font-semibold text-calm-900 max-w-3xl leading-[1.1]">
+            Conteúdo para cuidar da sua saúde emocional
+          </h1>
+          <p className="mt-5 text-calm-600 text-lg max-w-2xl leading-relaxed">
+            Textos acolhedores e baseados em evidências para você entender melhor o que sente e
+            tomar decisões informadas sobre o seu bem-estar.
+          </p>
         </div>
-      )}
+      </section>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
+        <Suspense fallback={<div className="h-10 mb-10" />}>
+          <CategoryFilter categories={visibleCategories} />
+        </Suspense>
+
+        {articles.length === 0 ? (
+          <div className="rounded-[var(--radius-card)] bg-white ring-1 ring-calm-200 px-6 py-16 text-center">
+            <p className="font-display text-xl text-calm-900">Novos conteúdos em breve</p>
+            <p className="mt-2 text-calm-600">
+              {categoria
+                ? "Ainda não há artigos publicados neste tema."
+                : "Estamos preparando os primeiros artigos."}
+            </p>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {articles.map((article, i) => (
+              <ArticleCard
+                key={`${article.category}-${article.slug}`}
+                article={article}
+                featured={i === 0 && !categoria && articles.length > 2}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
-import { Fraunces, DM_Sans } from "next/font/google";
+import { Montserrat, DM_Sans, Source_Serif_4 } from "next/font/google";
 import { SupportBanner } from "@/components/SupportBanner";
 import { AppShell } from "@/components/AppShell";
 import { AuthProvider } from "@/lib/auth-context";
 import { siteConfig } from "@/lib/blog/site";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-display",
-  axes: ["opsz", "SOFT"],
+  variable: "--font-heading",
+  weight: ["500", "600", "700"],
+  display: "swap",
+});
+
+const sourceSerif = Source_Serif_4({
+  subsets: ["latin"],
+  variable: "--font-reading",
   display: "swap",
 });
 
@@ -38,7 +44,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${fraunces.variable} ${dmSans.variable}`}>
+    <html lang="pt-BR" className={`${montserrat.variable} ${dmSans.variable} ${sourceSerif.variable}`}>
       <body className="min-h-dvh flex flex-col">
         <SupportBanner />
         <AuthProvider>

@@ -11,7 +11,7 @@
 
 import { randomUUID } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { AccessToken } from "livekit-server-sdk";
+import { AccessToken, RoomServiceClient } from "livekit-server-sdk";
 import {
   CALL_ACCEPT_TIMEOUT_MS,
   HEARTBEAT_INTERVAL_MS,
@@ -31,6 +31,13 @@ export interface SessionSocket {
   close(code?: number, reason?: string): void;
   on(event: string, listener: (...args: unknown[]) => void): void;
 }
+
+/**
+ * Validade do token LiveKit para ENTRAR na sala. Conexões já estabelecidas são
+ * renovadas pelo próprio LiveKit; ao recarregar a página o cliente pede um
+ * token novo em GET /sessions/:id. Curto = token vazado perde valor rápido.
+ */
+const LIVEKIT_TOKEN_TTL_SECONDS = 30 * 60;
 
 interface RuntimeEntry {
   id: string;
@@ -87,6 +94,37 @@ export class SessionRuntime {
     private readonly logger: { warn: (...args: any[]) => void; error: (...args: any[]) => void },
   ) {
     this.encryptionKey = loadEncryptionKey(env.COLUMN_ENCRYPTION_KEY);
+    // RoomService usa HTTP(S); LIVEKIT_URL vem como wss://.
+    this.roomService =
+      env.NODE_ENV === "test"
+        ? null
+        : new RoomServiceClient(env.LIVEKIT_URL.replace(/^ws/, "http"), env.LIVEKIT_API_KEY, env.LIVEKIT_API_SECRET);
+  }
+
+  private readonly roomService: RoomServiceClient | null;
+
+  /**
+   * Sala criada explicitamente: no máximo 2 participantes (paciente + psicólogo)
+   * e some sozinha se ficar vazia. Falha aqui não bloqueia a consulta
+   * (LiveKit cria a sala no primeiro join), mas fica registrada.
+   */
+  private async prepareRoom(room: string): Promise<void> {
+    if (!this.roomService) return;
+    try {
+      await this.roomService.createRoom({ name: room, maxParticipants: 2, emptyTimeout: 120 });
+    } catch (err) {
+      this.logger.warn({ err, room }, "livekit: falha ao criar sala com limite de participantes");
+    }
+  }
+
+  /** Encerra a sala no LiveKit: desconecta todos e invalida a sala. */
+  private async closeRoom(room: string): Promise<void> {
+    if (!this.roomService) return;
+    try {
+      await this.roomService.deleteRoom(room);
+    } catch (err) {
+      this.logger.warn({ err, room }, "livekit: falha ao encerrar sala");
+    }
   }
 
   // ── WebSocket registry ────────────────────────────────────────────────────
@@ -298,11 +336,13 @@ export class SessionRuntime {
       }, CALL_ACCEPT_TIMEOUT_MS);
       this.sessions.set(sessionId, entry);
 
+      await this.prepareRoom(livekitRoom);
+
       const patientToken = await this.mintLiveKitToken({
         room: livekitRoom,
         identity: patientId,
         name: "paciente",
-        ttlSeconds: Math.ceil(CALL_ACCEPT_TIMEOUT_MS / 1000) + 3600,
+        ttlSeconds: Math.ceil(CALL_ACCEPT_TIMEOUT_MS / 1000) + LIVEKIT_TOKEN_TTL_SECONDS,
       });
 
       const { data: patientRow } = await this.supabase
@@ -381,7 +421,7 @@ export class SessionRuntime {
       room: entry.livekitRoom,
       identity: psychologistId,
       name: "psicologo",
-      ttlSeconds: 4 * 3600,
+      ttlSeconds: LIVEKIT_TOKEN_TTL_SECONDS,
     });
 
     return {
@@ -410,6 +450,7 @@ export class SessionRuntime {
     if (entry.acceptTimer) clearTimeout(entry.acceptTimer);
     entry.phase = "ENDED";
     this.sessions.delete(entry.id);
+    void this.closeRoom(entry.livekitRoom);
 
     await this.supabase
       .from("sessions")
@@ -560,6 +601,7 @@ export class SessionRuntime {
     if (entry.tickTimer) clearInterval(entry.tickTimer);
     entry.phase = "ENDED";
     this.sessions.delete(entry.id);
+    void this.closeRoom(entry.livekitRoom);
 
     const remainderCents = entry.holdCents - effect.totalCents;
     if (remainderCents > 0) {
@@ -651,7 +693,18 @@ export class SessionRuntime {
       name: params.name,
       ttl: params.ttlSeconds,
     });
-    at.addGrant({ room: params.room, roomJoin: true, canPublish: true, canSubscribe: true });
+    at.addGrant({
+      room: params.room,
+      roomJoin: true,
+      canPublish: true,
+      canSubscribe: true,
+      canPublishData: true,
+      canUpdateOwnMetadata: false,
+      roomAdmin: false,
+      roomCreate: false,
+      roomRecord: false,
+      hidden: false,
+    });
     return at.toJwt();
   }
 
@@ -665,11 +718,12 @@ export class SessionRuntime {
   async reconcileOnBoot(): Promise<void> {
     const { data: stale } = await this.supabase
       .from("sessions")
-      .select("id, patient_id")
+      .select("id, patient_id, livekit_room")
       .in("status", ["PENDING", "ACTIVE", "SUSPENDED"]);
 
     for (const s of stale ?? []) {
       if (this.sessions.has(s.id)) continue;
+      if (s.livekit_room) void this.closeRoom(s.livekit_room as string);
       await this.supabase
         .from("sessions")
         .update({ status: "ENDED", ended_at: new Date().toISOString(), motivo_encerramento: "ERROR" })
@@ -722,6 +776,8 @@ export class SessionRuntime {
         .maybeSingle();
       if (!data || data.status === "ENDED" || data.status === "CANCELLED") return null;
       if (data.patient_id !== userId && data.psychologist_id !== userId) return null;
+      // Psicólogo só entra na sala depois de aceitar a chamada.
+      if (data.status === "PENDING" && data.psychologist_id === userId) return null;
       try {
         hbSecret = decryptFromBytea(this.encryptionKey, data.hb_secret_encrypted as string);
       } catch {
@@ -732,6 +788,8 @@ export class SessionRuntime {
       psychologistId = data.psychologist_id;
     } else if (entry.patientId !== userId && entry.psychologistId !== userId) {
       return null;
+    } else if (entry.phase === "PENDING" && entry.psychologistId === userId) {
+      return null;
     }
 
     if (!hbSecret || !livekitRoom || !patientId || !psychologistId) return null;
@@ -740,7 +798,7 @@ export class SessionRuntime {
       room: livekitRoom,
       identity: userId,
       name: userId === psychologistId ? "psicologo" : "paciente",
-      ttlSeconds: 4 * 3600,
+      ttlSeconds: LIVEKIT_TOKEN_TTL_SECONDS,
     });
 
     return { livekitToken, hbSecret, livekitRoom };

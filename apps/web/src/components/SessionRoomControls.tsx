@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 function MicIcon({ off }: { off: boolean }) {
   return (
@@ -53,8 +54,28 @@ export function SessionRoomControls({
   onEndSession: () => void;
   showSupportLink?: boolean;
 }) {
+  const [confirmEnd, setConfirmEnd] = useState(false);
+  useEffect(() => {
+    if (!confirmEnd) return;
+    const t = setTimeout(() => setConfirmEnd(false), 6000);
+    return () => clearTimeout(t);
+  }, [confirmEnd]);
+
   return (
-    <div className="shrink-0 bg-[#0f1419] px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+    <div className="shrink-0 bg-[#121a15] px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+      {confirmEnd && (
+        <div role="alertdialog" aria-label="Confirmar encerramento" className="mx-auto mb-3 flex max-w-md items-center justify-between gap-3 rounded-2xl bg-white/10 px-4 py-3 ring-1 ring-white/15 animate-rise-in">
+          <p className="text-sm text-white">Encerrar a consulta? Não é possível retomar depois.</p>
+          <div className="flex shrink-0 gap-2">
+            <button type="button" onClick={() => setConfirmEnd(false)} className="rounded-full px-3 py-1.5 text-sm text-white/80 hover:bg-white/10">
+              Voltar
+            </button>
+            <button type="button" onClick={onEndSession} className="rounded-full bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700">
+              Encerrar
+            </button>
+          </div>
+        </div>
+      )}
       <div className="mx-auto flex max-w-md items-center justify-center gap-4">
         <button
           type="button"
@@ -64,7 +85,7 @@ export function SessionRoomControls({
           className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
             micEnabled
               ? "bg-white/15 text-white hover:bg-white/25"
-              : "bg-white text-[#0f1419] hover:bg-white/90"
+              : "bg-white text-[#121a15] hover:bg-white/90"
           }`}
         >
           <MicIcon off={!micEnabled} />
@@ -77,7 +98,7 @@ export function SessionRoomControls({
           className={`flex h-12 w-12 items-center justify-center rounded-full transition-colors ${
             camEnabled
               ? "bg-white/15 text-white hover:bg-white/25"
-              : "bg-white text-[#0f1419] hover:bg-white/90"
+              : "bg-white text-[#121a15] hover:bg-white/90"
           }`}
         >
           <CameraIcon off={!camEnabled} />
@@ -85,7 +106,7 @@ export function SessionRoomControls({
 
         <button
           type="button"
-          onClick={onEndSession}
+          onClick={() => setConfirmEnd(true)}
           aria-label="Encerrar consulta"
           className="ml-2 flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-md hover:bg-red-700"
         >

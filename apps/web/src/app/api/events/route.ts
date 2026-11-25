@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createSupabaseAdmin } from "@/lib/blog/supabase";
+import { clientIp, rateLimit } from "@/lib/server/rate-limit";
 import { ANALYTICS_EVENT_WHITELIST, type AnalyticsEvent } from "@/lib/blog/analytics";
 
 const ALLOWED = new Set<string>(ANALYTICS_EVENT_WHITELIST);
@@ -12,6 +13,9 @@ function asOptionalString(value: unknown, maxLen = 500): string | null {
 }
 
 export async function POST(request: Request) {
+  if (!rateLimit(`evt:${clientIp(request)}`, 120, 60_000)) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+  }
   try {
     const body = (await request.json()) as Record<string, unknown>;
     const event = typeof body.event === "string" ? body.event : null;
@@ -62,7 +66,8 @@ export async function POST(request: Request) {
     const properties: Record<string, string> = {};
     for (const [key, value] of Object.entries(body)) {
       if (reserved.has(key)) continue;
-      if (typeof value !== "string") continue;
+      if (typeof value !== "string" || key.length > 64) continue;
+      if (Object.keys(properties).length >= 20) break;
       const trimmed = value.trim();
       if (!trimmed) continue;
       properties[key] = trimmed.slice(0, 500);

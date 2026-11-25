@@ -28,12 +28,12 @@ export function FAQAccordion({ items, id = "faq" }: FAQAccordionProps) {
             aria-expanded={openIndex === index}
           >
             <span>{item.question}</span>
-            <span className="text-khoros-cyan text-xl shrink-0">
+            <span className="text-brand-600 text-xl shrink-0">
               {openIndex === index ? "−" : "+"}
             </span>
           </button>
           {openIndex === index && (
-            <div className="px-5 pb-4 text-khoros-slate leading-relaxed">
+            <div className="px-5 pb-4 text-calm-600 leading-relaxed">
               {item.answer}
             </div>
           )}
